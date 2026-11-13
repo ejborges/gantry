@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Fill a fresh development server with realistic sample data through the public API."""
-import json, sys, urllib.request, http.cookiejar
+import json, os, sys, urllib.request, http.cookiejar
 
-BASE = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8600"
+BASE = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:" + os.environ.get("GANTRY_BIND", "127.0.0.1:8600").rsplit(":", 1)[-1]
 PASSWORD = "correct horse battery staple"
 
 

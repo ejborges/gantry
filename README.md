@@ -84,14 +84,37 @@ cd /vagrant
 ```
 
 `dev/provision.sh` runs on first boot and installs: GCC, Rust (rustup), Node.js 22,
-PostgreSQL 16 with pgvector, nginx, Valkey, Podman, the RPM build tools and the libraries the
-test browser needs. Ports 8600 (Gantry), 5173 (Vite) and 8443 (nginx, for package tests) are
-forwarded to your computer.
+PostgreSQL 16 with pgvector, nginx, Valkey, Podman, the RPM build tools, the libraries the
+test browser needs, and a desktop (GNOME, Firefox, the VMware display tools).
+
+**The desktop.** Sign in as `vagrant`, password `vagrant`. The window can be any size and
+follows the VMware window. To keep the machine in your VMware Workstation library and start
+it from there without Vagrant, run once on Windows:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File dev\vm-open.ps1
+```
+
+(On a Mac, open the `.vmx` file that `vagrant up` names with Fusion's **File > Open**.)
+Vagrant keeps managing the same machine, and `vagrant destroy` deletes it.
+
+**Ports.** Inside the machine Gantry is on 8600 (Firefox in the desktop: http://localhost:8600).
+On your computer Vagrant forwards 8600, 5173 (Vite) and 8443 (nginx, for package tests), or
+other free ports when those are taken, and after every `vagrant up` says which. They are
+written to `.vagrant/gantry-ports.env` and `.vagrant/gantry-ports.json` on your computer and
+to `/etc/gantry-dev/host-ports.env` in the machine, and used from there: `dev/run-local.sh`
+prints the address to open on your computer, and the browser tests and manual screenshots run
+from your computer find the machine's Gantry by themselves. The machine's own address
+(`http://<address>:8600`, also in those files) works from your computer too.
 
 | Setting | Default | Change with |
 | --- | --- | --- |
-| Box | `almalinux/9` | `GANTRY_BOX=almalinux/10 vagrant up …` (any EL 9 or 10 box with a `vmware_desktop` build) |
+| Box | `almalinux/9` | `GANTRY_BOX=almalinux/10 vagrant up …` (any EL 9 or 10 box with a `vmware_desktop` build; for AlmaLinux boxes also `VAGRANT_SERVER_URL=https://vagrant.almalinux.org`) |
 | CPUs, memory | 4, 8 GB | `GANTRY_VM_CPUS`, `GANTRY_VM_MEMORY_MB` |
+| Desktop | installed | `GANTRY_VM_GUI=0` leaves it out |
+| Password of `vagrant` | `vagrant` | `GANTRY_VM_PASSWORD` |
+| Open the VMware window on `vagrant up` | no | `GANTRY_VM_WINDOW=1` |
+| Ports on your computer | 8600, 5173, 8443, or free ones | `GANTRY_HOST_PORT_APP`, `GANTRY_HOST_PORT_VITE`, `GANTRY_HOST_PORT_HTTPS` |
 | Rust toolchain | current stable | `GANTRY_RUST_VERSION=1.90.0` |
 
 The source tree is copied into the guest with rsync. After editing on the host, run
@@ -179,8 +202,8 @@ Browser tests run in Chromium at three screen sizes. To add Safari's engine:
 ```bash
 cd web && npx playwright install webkit       # supported on macOS, Windows, Debian and Ubuntu
 GANTRY_E2E_WEBKIT=1 dev/e2e.sh
-# or, from a Mac, against a server running elsewhere:
-GANTRY_E2E_WEBKIT=1 GANTRY_E2E_URL=http://localhost:8600 npx playwright test
+# or, from your computer, against the Gantry running in the Vagrant machine (set GANTRY_E2E_URL for another server):
+GANTRY_E2E_WEBKIT=1 npx playwright test       # finds the Vagrant machine's Gantry by itself
 ```
 
 ## Building the RPMs

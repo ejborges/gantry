@@ -1,4 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
+import { createRequire } from "node:module";
+const { baseUrl } = createRequire(import.meta.url)("./scripts/base-url.cjs") as { baseUrl: () => string };
 
 // Browser tests run against a live server with the sample data (dev/run-local.sh, or dev/e2e.sh
 // which starts one for you). Chromium runs everywhere; WebKit (Safari's engine) is added with
@@ -14,7 +16,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: [["list"]],
   use: {
-    baseURL: process.env.GANTRY_E2E_URL ?? "http://127.0.0.1:8600",
+    baseURL: baseUrl(), // GANTRY_E2E_URL, the Vagrant machine's forwarded port, or this machine: see scripts/base-url.cjs
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },

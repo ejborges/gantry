@@ -2,7 +2,7 @@
 //   node web/scripts/manual-shots.cjs docs/manual/src/img
 const { chromium } = require('playwright');
 const out = process.argv[2];
-const BASE = process.env.GANTRY_E2E_URL || 'http://127.0.0.1:8600';
+const BASE = require('./base-url.cjs').baseUrl();
 (async () => {
   const browser = await chromium.launch();
   const open = async (email) => {
