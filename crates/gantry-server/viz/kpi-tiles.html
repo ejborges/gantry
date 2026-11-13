@@ -1,0 +1,23 @@
+<!-- Four numbers at a glance. Plain HTML with a script; no chart library. -->
+<style>
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; height: 100%; align-content: center; padding: 4px; }
+  .kpi { border: 1px solid var(--grid); border-radius: 8px; padding: 12px 14px; }
+  .kpi b { display: block; font-size: 30px; line-height: 1.1; }
+  .kpi span { color: var(--muted); font-size: 13px; }
+  /* A figure that needs attention is marked on its edge and in words; the number stays in ink. */
+  .kpi.warn { border-left: 3px solid var(--danger); }
+  .kpi.warn span::after { content: ' · needs attention'; }
+</style>
+<div class="kpis" id="kpis" role="list"></div>
+<script>
+  const data = await gantry.api.get('/api/v1/analytics/summary', { project: gantry.params.project, container: gantry.params.container });
+  const tiles = [['Open', data.open], ['Overdue', data.overdue, data.overdue > 0], ['Unassigned', data.unassigned], ['Resolved in 30 days', data.resolved_30d]];
+  const box = document.getElementById('kpis');
+  for (const [label, value, warn] of tiles) {
+    const el = box.appendChild(document.createElement('div'));
+    el.className = 'kpi' + (warn ? ' warn' : '');
+    el.setAttribute('role', 'listitem');
+    el.appendChild(document.createElement('b')).textContent = value;
+    el.appendChild(document.createElement('span')).textContent = label;
+  }
+</script>

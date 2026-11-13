@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<!-- Try the same address again every 30 seconds: after a restart or an upgrade, people land
+     back where they were without doing anything. -->
+<meta http-equiv="refresh" content="30">
+<title>Temporarily unavailable</title>
+<style>
+:root{color-scheme:light dark;--bg:#f3f5f8;--surface:#fff;--ink:#16202b;--muted:#5a6877;--line:#d9dfe7;--action:#1a56c4;--mark:#f2b705}
+@media (prefers-color-scheme:dark){:root{--bg:#10171f;--surface:#18212c;--ink:#e7ecf2;--muted:#99a6b4;--line:#2a3643;--action:#73a5ff}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px 16px;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{width:100%;max-width:560px;padding:28px 28px 22px;background:var(--surface);border:1px solid var(--line);border-radius:11px}
+.code{margin:0 0 4px;color:var(--muted);font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+h1{margin:0 0 12px;font-size:24px;line-height:1.25}
+h2{margin:22px 0 6px;font-size:15px}
+p{margin:0 0 10px}
+a{color:var(--action)}
+.bar{height:4px;margin:18px 0 4px;border-radius:2px;background:var(--line);overflow:hidden}
+.bar span{display:block;width:30%;height:100%;border-radius:2px;background:var(--mark);animation:slide 1.6s ease-in-out infinite}
+@keyframes slide{0%{margin-left:-30%}100%{margin-left:100%}}
+@media (prefers-reduced-motion:reduce){.bar span{animation:none;width:100%;opacity:.5}}
+.ref{margin-top:18px;padding-top:12px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<main>
+<p class="code">Temporarily unavailable</p>
+<h1>The application is not answering right now</h1>
+<p>It may be restarting or being upgraded. Your work is stored on the server and is not affected.</p>
+<div class="bar" role="progressbar" aria-label="Waiting for the application"><span></span></div>
+<p class="ref" style="border:0;margin:0;padding:0">This page tries again by itself every 30 seconds. <a href="">Try now</a></p>
+<h2>What you can do</h2>
+<p>Wait a minute or two. If you were in the middle of writing something, keep this tab open: the page you were on returns when the application does.</p>
+<h2>Getting help</h2>
+<!-- System administrators: put your support contact here. See "When the application is down" in the system administrator guide. -->
+<p>If this lasts longer than a few minutes, contact the people who run this installation in your organization.</p>
+<p class="ref">When you ask for help, say when this started and which address you were opening.</p>
+</main>
+</body>
+</html>

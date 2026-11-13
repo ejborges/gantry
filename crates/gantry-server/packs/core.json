@@ -1,0 +1,354 @@
+{
+  "id": "core",
+  "name": "Gantry core",
+  "version": "0.2.0",
+  "description": "Built-in work item types, workflows, fields and templates for software, engineering, science, management, finance, legal, logistics, procurement, safety and service desks.",
+  "fields": [
+    {"key": "severity", "name": "Severity", "type": "select", "options": ["Critical", "Major", "Minor", "Trivial"]},
+    {"key": "environment", "name": "Environment", "type": "text", "description": "Where the problem occurs: version, site, system."},
+    {"key": "steps_to_reproduce", "name": "Steps to reproduce", "type": "textarea"},
+    {"key": "acceptance_criteria", "name": "Acceptance criteria", "type": "textarea"},
+    {"key": "story_points", "name": "Story points", "type": "number"},
+    {"key": "affected_system", "name": "Affected system", "type": "text"},
+    {"key": "change_impact", "name": "Impact of change", "type": "select", "options": ["Low", "Medium", "High"]},
+    {"key": "justification", "name": "Justification", "type": "textarea"},
+    {"key": "root_cause", "name": "Root cause", "type": "textarea"},
+    {"key": "corrective_action", "name": "Corrective action", "type": "textarea"},
+    {"key": "hypothesis", "name": "Hypothesis", "type": "textarea"},
+    {"key": "method", "name": "Method", "type": "textarea"},
+    {"key": "result_summary", "name": "Result summary", "type": "textarea"},
+    {"key": "amount", "name": "Amount", "type": "number"},
+    {"key": "currency", "name": "Currency", "type": "select", "options": ["USD", "EUR", "GBP", "CAD", "JPY", "Other"]},
+    {"key": "cost_center", "name": "Cost center", "type": "text"},
+    {"key": "vendor", "name": "Vendor", "type": "text"},
+    {"key": "needed_by", "name": "Needed by", "type": "date"},
+    {"key": "po_number", "name": "Purchase order number", "type": "text"},
+    {"key": "approver", "name": "Approver", "type": "user"},
+    {"key": "period", "name": "Accounting period", "type": "text"},
+    {"key": "counterparty", "name": "Counterparty", "type": "text"},
+    {"key": "matter_type", "name": "Matter type", "type": "select", "options": ["Contract", "Dispute", "Compliance", "Intellectual property", "Employment", "Other"]},
+    {"key": "jurisdiction", "name": "Jurisdiction", "type": "text"},
+    {"key": "effective_date", "name": "Effective date", "type": "date"},
+    {"key": "expiry_date", "name": "Expiry date", "type": "date"},
+    {"key": "origin", "name": "Origin", "type": "text"},
+    {"key": "destination", "name": "Destination", "type": "text"},
+    {"key": "carrier", "name": "Carrier", "type": "text"},
+    {"key": "tracking_number", "name": "Tracking number", "type": "text"},
+    {"key": "ship_date", "name": "Ship date", "type": "date"},
+    {"key": "delivery_date", "name": "Delivery date", "type": "date"},
+    {"key": "location", "name": "Location", "type": "text"},
+    {"key": "incident_date", "name": "Date of occurrence", "type": "date"},
+    {"key": "injury", "name": "Injury involved", "type": "checkbox"},
+    {"key": "hazard_category", "name": "Hazard category", "type": "select", "options": ["Chemical", "Electrical", "Ergonomic", "Fire", "Mechanical", "Pressure", "Radiation", "Thermal", "Working at height", "Other"]},
+    {"key": "likelihood", "name": "Likelihood", "type": "select", "options": ["1", "2", "3", "4", "5"], "description": "1 = very unlikely, 5 = near certain."},
+    {"key": "consequence", "name": "Consequence", "type": "select", "options": ["1", "2", "3", "4", "5"], "description": "1 = negligible, 5 = severe."},
+    {"key": "mitigation", "name": "Mitigation", "type": "textarea"},
+    {"key": "decision_outcome", "name": "Decision", "type": "textarea"},
+    {"key": "impact", "name": "Impact", "type": "select", "options": ["Low", "Medium", "High"]},
+    {"key": "urgency", "name": "Urgency", "type": "select", "options": ["Low", "Medium", "High"]},
+    {"key": "reference_url", "name": "Reference link", "type": "url"}
+  ],
+  "workflows": [
+    {
+      "key": "simple", "name": "Simple", "initial": "todo",
+      "statuses": [
+        {"key": "todo", "name": "To do", "category": "todo"},
+        {"key": "in_progress", "name": "In progress", "category": "in_progress"},
+        {"key": "done", "name": "Done", "category": "done"}
+      ],
+      "transitions": [
+        {"name": "Move to To do", "from": ["*"], "to": "todo"},
+        {"name": "Start", "from": ["*"], "to": "in_progress"},
+        {"name": "Complete", "from": ["*"], "to": "done"}
+      ]
+    },
+    {
+      "key": "software", "name": "Software delivery", "initial": "backlog",
+      "statuses": [
+        {"key": "backlog", "name": "Backlog", "category": "todo"},
+        {"key": "todo", "name": "To do", "category": "todo"},
+        {"key": "in_progress", "name": "In progress", "category": "in_progress"},
+        {"key": "in_review", "name": "In review", "category": "in_progress"},
+        {"key": "done", "name": "Done", "category": "done"}
+      ],
+      "transitions": [
+        {"name": "Send to backlog", "from": ["*"], "to": "backlog"},
+        {"name": "Plan", "from": ["*"], "to": "todo"},
+        {"name": "Start", "from": ["*"], "to": "in_progress"},
+        {"name": "Request review", "from": ["*"], "to": "in_review"},
+        {"name": "Complete", "from": ["*"], "to": "done"}
+      ]
+    },
+    {
+      "key": "service", "name": "Service request", "initial": "open",
+      "statuses": [
+        {"key": "open", "name": "Open", "category": "todo"},
+        {"key": "in_progress", "name": "In progress", "category": "in_progress"},
+        {"key": "waiting_customer", "name": "Waiting for customer", "category": "in_progress"},
+        {"key": "resolved", "name": "Resolved", "category": "done"},
+        {"key": "closed", "name": "Closed", "category": "done"}
+      ],
+      "transitions": [
+        {"name": "Start work", "from": ["open", "waiting_customer"], "to": "in_progress"},
+        {"name": "Ask customer", "from": ["open", "in_progress"], "to": "waiting_customer"},
+        {"name": "Resolve", "from": ["open", "in_progress", "waiting_customer"], "to": "resolved"},
+        {"name": "Reopen", "from": ["resolved", "closed"], "to": "open"},
+        {"name": "Close", "from": ["resolved"], "to": "closed"}
+      ]
+    },
+    {
+      "key": "change", "name": "Controlled change", "initial": "draft",
+      "statuses": [
+        {"key": "draft", "name": "Draft", "category": "todo"},
+        {"key": "in_review", "name": "In review", "category": "in_progress"},
+        {"key": "approved", "name": "Approved", "category": "in_progress"},
+        {"key": "implementing", "name": "Implementing", "category": "in_progress"},
+        {"key": "verified", "name": "Verified", "category": "in_progress"},
+        {"key": "closed", "name": "Closed", "category": "done"},
+        {"key": "rejected", "name": "Rejected", "category": "done"}
+      ],
+      "transitions": [
+        {"name": "Submit for review", "from": ["draft"], "to": "in_review", "requires": ["justification"]},
+        {"name": "Return to author", "from": ["in_review"], "to": "draft"},
+        {"name": "Approve", "from": ["in_review"], "to": "approved", "requires": ["change_impact"]},
+        {"name": "Reject", "from": ["in_review"], "to": "rejected"},
+        {"name": "Begin implementation", "from": ["approved"], "to": "implementing"},
+        {"name": "Mark verified", "from": ["implementing"], "to": "verified"},
+        {"name": "Close", "from": ["verified"], "to": "closed"},
+        {"name": "Reopen", "from": ["rejected", "closed"], "to": "draft"}
+      ]
+    },
+    {
+      "key": "research", "name": "Research", "initial": "proposed",
+      "statuses": [
+        {"key": "proposed", "name": "Proposed", "category": "todo"},
+        {"key": "planned", "name": "Planned", "category": "todo"},
+        {"key": "running", "name": "Running", "category": "in_progress"},
+        {"key": "analysis", "name": "Analysis", "category": "in_progress"},
+        {"key": "complete", "name": "Complete", "category": "done"},
+        {"key": "abandoned", "name": "Abandoned", "category": "done"}
+      ],
+      "transitions": [
+        {"name": "Plan", "from": ["proposed"], "to": "planned", "requires": ["hypothesis"]},
+        {"name": "Start run", "from": ["planned", "analysis"], "to": "running"},
+        {"name": "Analyze", "from": ["running"], "to": "analysis"},
+        {"name": "Complete", "from": ["analysis"], "to": "complete", "requires": ["result_summary"]},
+        {"name": "Abandon", "from": ["proposed", "planned", "running", "analysis"], "to": "abandoned"},
+        {"name": "Reopen", "from": ["complete", "abandoned"], "to": "proposed"}
+      ]
+    },
+    {
+      "key": "approval", "name": "Approval", "initial": "todo",
+      "statuses": [
+        {"key": "todo", "name": "To do", "category": "todo"},
+        {"key": "in_progress", "name": "In progress", "category": "in_progress"},
+        {"key": "awaiting_approval", "name": "Awaiting approval", "category": "in_progress"},
+        {"key": "approved", "name": "Approved", "category": "done"},
+        {"key": "declined", "name": "Declined", "category": "done"}
+      ],
+      "transitions": [
+        {"name": "Start", "from": ["todo"], "to": "in_progress"},
+        {"name": "Request approval", "from": ["todo", "in_progress"], "to": "awaiting_approval", "requires": ["approver"]},
+        {"name": "Approve", "from": ["awaiting_approval"], "to": "approved"},
+        {"name": "Decline", "from": ["awaiting_approval"], "to": "declined"},
+        {"name": "Rework", "from": ["awaiting_approval", "declined"], "to": "in_progress"}
+      ]
+    },
+    {
+      "key": "legal", "name": "Legal matter", "initial": "intake",
+      "statuses": [
+        {"key": "intake", "name": "Intake", "category": "todo"},
+        {"key": "in_review", "name": "In review", "category": "in_progress"},
+        {"key": "negotiation", "name": "Negotiation", "category": "in_progress"},
+        {"key": "awaiting_signature", "name": "Awaiting signature", "category": "in_progress"},
+        {"key": "executed", "name": "Executed", "category": "done"},
+        {"key": "closed", "name": "Closed", "category": "done"}
+      ],
+      "transitions": [
+        {"name": "Accept for review", "from": ["intake"], "to": "in_review"},
+        {"name": "Negotiate", "from": ["in_review", "awaiting_signature"], "to": "negotiation"},
+        {"name": "Send for signature", "from": ["in_review", "negotiation"], "to": "awaiting_signature"},
+        {"name": "Mark executed", "from": ["awaiting_signature"], "to": "executed", "requires": ["effective_date"]},
+        {"name": "Close", "from": ["intake", "in_review", "negotiation", "executed"], "to": "closed"},
+        {"name": "Reopen", "from": ["closed"], "to": "in_review"}
+      ]
+    },
+    {
+      "key": "shipment", "name": "Shipment", "initial": "planned",
+      "statuses": [
+        {"key": "planned", "name": "Planned", "category": "todo"},
+        {"key": "picked", "name": "Picked and packed", "category": "in_progress"},
+        {"key": "in_transit", "name": "In transit", "category": "in_progress"},
+        {"key": "exception", "name": "Exception", "category": "in_progress"},
+        {"key": "delivered", "name": "Delivered", "category": "done"},
+        {"key": "closed", "name": "Closed", "category": "done"}
+      ],
+      "transitions": [
+        {"name": "Pick and pack", "from": ["planned"], "to": "picked"},
+        {"name": "Dispatch", "from": ["picked", "exception"], "to": "in_transit", "requires": ["carrier"]},
+        {"name": "Raise exception", "from": ["picked", "in_transit"], "to": "exception"},
+        {"name": "Confirm delivery", "from": ["in_transit"], "to": "delivered"},
+        {"name": "Close", "from": ["delivered", "exception"], "to": "closed"}
+      ]
+    },
+    {
+      "key": "procurement", "name": "Procurement", "initial": "draft",
+      "statuses": [
+        {"key": "draft", "name": "Draft", "category": "todo"},
+        {"key": "submitted", "name": "Submitted", "category": "in_progress"},
+        {"key": "approved", "name": "Approved", "category": "in_progress"},
+        {"key": "ordered", "name": "Ordered", "category": "in_progress"},
+        {"key": "received", "name": "Received", "category": "done"},
+        {"key": "rejected", "name": "Rejected", "category": "done"},
+        {"key": "canceled", "name": "Canceled", "category": "done"}
+      ],
+      "transitions": [
+        {"name": "Submit", "from": ["draft"], "to": "submitted", "requires": ["amount", "justification"]},
+        {"name": "Return to requester", "from": ["submitted"], "to": "draft"},
+        {"name": "Approve", "from": ["submitted"], "to": "approved"},
+        {"name": "Reject", "from": ["submitted"], "to": "rejected"},
+        {"name": "Place order", "from": ["approved"], "to": "ordered", "requires": ["vendor"]},
+        {"name": "Confirm receipt", "from": ["ordered"], "to": "received"},
+        {"name": "Cancel", "from": ["draft", "submitted", "approved", "ordered"], "to": "canceled"}
+      ]
+    },
+    {
+      "key": "safety", "name": "Safety event", "initial": "reported",
+      "statuses": [
+        {"key": "reported", "name": "Reported", "category": "todo"},
+        {"key": "triage", "name": "Triage", "category": "in_progress"},
+        {"key": "investigating", "name": "Investigating", "category": "in_progress"},
+        {"key": "corrective_action", "name": "Corrective action", "category": "in_progress"},
+        {"key": "verification", "name": "Verification", "category": "in_progress"},
+        {"key": "closed", "name": "Closed", "category": "done"}
+      ],
+      "transitions": [
+        {"name": "Triage", "from": ["reported"], "to": "triage"},
+        {"name": "Investigate", "from": ["triage"], "to": "investigating"},
+        {"name": "Assign corrective action", "from": ["investigating"], "to": "corrective_action", "requires": ["root_cause"]},
+        {"name": "Verify effectiveness", "from": ["corrective_action"], "to": "verification", "requires": ["corrective_action"]},
+        {"name": "Close", "from": ["triage", "verification"], "to": "closed"},
+        {"name": "Reopen", "from": ["closed"], "to": "investigating"}
+      ]
+    },
+    {
+      "key": "risk", "name": "Risk", "initial": "identified",
+      "statuses": [
+        {"key": "identified", "name": "Identified", "category": "todo"},
+        {"key": "assessed", "name": "Assessed", "category": "in_progress"},
+        {"key": "mitigating", "name": "Mitigating", "category": "in_progress"},
+        {"key": "accepted", "name": "Accepted", "category": "done"},
+        {"key": "closed", "name": "Closed", "category": "done"}
+      ],
+      "transitions": [
+        {"name": "Assess", "from": ["identified"], "to": "assessed", "requires": ["likelihood", "consequence"]},
+        {"name": "Mitigate", "from": ["assessed"], "to": "mitigating", "requires": ["mitigation"]},
+        {"name": "Accept", "from": ["assessed", "mitigating"], "to": "accepted"},
+        {"name": "Close", "from": ["assessed", "mitigating", "accepted"], "to": "closed"},
+        {"name": "Reopen", "from": ["accepted", "closed"], "to": "identified"}
+      ]
+    },
+    {
+      "key": "decision", "name": "Decision", "initial": "proposed",
+      "statuses": [
+        {"key": "proposed", "name": "Proposed", "category": "todo"},
+        {"key": "decided", "name": "Decided", "category": "done"},
+        {"key": "superseded", "name": "Superseded", "category": "done"}
+      ],
+      "transitions": [
+        {"name": "Decide", "from": ["proposed"], "to": "decided", "requires": ["decision_outcome"]},
+        {"name": "Supersede", "from": ["decided"], "to": "superseded"},
+        {"name": "Reopen", "from": ["decided", "superseded"], "to": "proposed"}
+      ]
+    }
+  ],
+  "item_types": [
+    {"key": "task", "name": "Task", "icon": "check-square", "color": "blue", "workflow": "simple", "description": "A piece of work."},
+    {"key": "milestone", "name": "Milestone", "icon": "flag", "color": "purple", "workflow": "simple", "description": "A dated checkpoint."},
+    {"key": "action_item", "name": "Action item", "icon": "arrow-right-circle", "color": "blue", "workflow": "simple", "description": "A follow-up owed by one person."},
+    {"key": "epic", "name": "Epic", "icon": "layers", "color": "purple", "workflow": "software", "description": "A large body of work split into stories."},
+    {"key": "story", "name": "Story", "icon": "bookmark", "color": "green", "workflow": "software", "description": "A user-visible capability.", "fields": [{"key": "acceptance_criteria"}, {"key": "story_points"}]},
+    {"key": "bug", "name": "Bug", "icon": "bug", "color": "red", "workflow": "software", "description": "Something that does not work as intended.", "fields": [{"key": "severity", "required": true}, {"key": "environment"}, {"key": "steps_to_reproduce"}]},
+    {"key": "change_request", "name": "Change request", "icon": "git-pull-request", "color": "amber", "workflow": "change", "description": "A controlled change that needs review and approval.", "fields": [{"key": "justification"}, {"key": "change_impact"}, {"key": "affected_system"}]},
+    {"key": "experiment", "name": "Experiment", "icon": "flask", "color": "teal", "workflow": "research", "description": "A study with a hypothesis, a method and a result.", "fields": [{"key": "hypothesis"}, {"key": "method"}, {"key": "result_summary"}]},
+    {"key": "initiative", "name": "Initiative", "icon": "target", "color": "purple", "workflow": "simple", "description": "A strategic goal that groups work."},
+    {"key": "decision", "name": "Decision", "icon": "scale", "color": "teal", "workflow": "decision", "description": "A recorded decision and its rationale.", "fields": [{"key": "decision_outcome"}]},
+    {"key": "risk", "name": "Risk", "icon": "alert-triangle", "color": "amber", "workflow": "risk", "description": "Something that may happen and what is being done about it.", "fields": [{"key": "likelihood"}, {"key": "consequence"}, {"key": "mitigation"}]},
+    {"key": "approval", "name": "Approval", "icon": "stamp", "color": "green", "workflow": "approval", "description": "Work that needs a named approver.", "fields": [{"key": "approver"}, {"key": "amount"}, {"key": "currency"}, {"key": "period"}, {"key": "cost_center"}]},
+    {"key": "matter", "name": "Matter", "icon": "briefcase", "color": "purple", "workflow": "legal", "description": "A legal matter.", "fields": [{"key": "matter_type", "required": true}, {"key": "counterparty"}, {"key": "jurisdiction"}, {"key": "effective_date"}, {"key": "expiry_date"}]},
+    {"key": "contract_review", "name": "Contract review", "icon": "file-text", "color": "blue", "workflow": "legal", "description": "Review of a contract or amendment.", "fields": [{"key": "counterparty", "required": true}, {"key": "amount"}, {"key": "currency"}, {"key": "effective_date"}, {"key": "expiry_date"}, {"key": "reference_url"}]},
+    {"key": "shipment", "name": "Shipment", "icon": "truck", "color": "blue", "workflow": "shipment", "description": "Goods moving from origin to destination.", "fields": [{"key": "origin", "required": true}, {"key": "destination", "required": true}, {"key": "carrier"}, {"key": "tracking_number"}, {"key": "ship_date"}, {"key": "delivery_date"}]},
+    {"key": "logistics_exception", "name": "Logistics exception", "icon": "alert-octagon", "color": "red", "workflow": "simple", "description": "Delay, damage, shortage or customs hold.", "fields": [{"key": "tracking_number"}, {"key": "root_cause"}]},
+    {"key": "purchase_request", "name": "Purchase request", "icon": "shopping-cart", "color": "green", "workflow": "procurement", "description": "A request to buy goods or services.", "fields": [{"key": "amount"}, {"key": "currency"}, {"key": "vendor"}, {"key": "cost_center"}, {"key": "needed_by"}, {"key": "justification"}, {"key": "po_number"}]},
+    {"key": "vendor_evaluation", "name": "Vendor evaluation", "icon": "clipboard-check", "color": "teal", "workflow": "simple", "description": "Assessment of a supplier.", "fields": [{"key": "vendor", "required": true}, {"key": "result_summary"}]},
+    {"key": "incident_report", "name": "Incident report", "icon": "siren", "color": "red", "workflow": "safety", "description": "An injury, near miss or unsafe condition.", "fields": [{"key": "location", "required": true}, {"key": "incident_date", "required": true}, {"key": "injury"}, {"key": "hazard_category"}, {"key": "root_cause"}, {"key": "corrective_action"}]},
+    {"key": "hazard", "name": "Hazard", "icon": "alert-triangle", "color": "amber", "workflow": "risk", "description": "A source of potential harm and its controls.", "fields": [{"key": "hazard_category"}, {"key": "location"}, {"key": "likelihood"}, {"key": "consequence"}, {"key": "mitigation"}]},
+    {"key": "corrective_action", "name": "Corrective action", "icon": "wrench", "color": "blue", "workflow": "simple", "description": "An action that removes a cause.", "fields": [{"key": "root_cause"}]},
+    {"key": "inspection", "name": "Inspection", "icon": "clipboard-check", "color": "teal", "workflow": "simple", "description": "A scheduled check.", "fields": [{"key": "location"}, {"key": "result_summary"}]},
+    {"key": "service_request", "name": "Service request", "icon": "help-circle", "color": "blue", "workflow": "service", "description": "A request for something standard.", "fields": [{"key": "affected_system"}]},
+    {"key": "incident", "name": "Incident", "icon": "zap", "color": "red", "workflow": "service", "description": "An unplanned interruption or degradation.", "fields": [{"key": "impact"}, {"key": "urgency"}, {"key": "affected_system"}]},
+    {"key": "problem", "name": "Problem", "icon": "search", "color": "amber", "workflow": "service", "description": "The underlying cause of one or more incidents.", "fields": [{"key": "root_cause"}, {"key": "corrective_action"}]}
+  ],
+  "project_templates": [
+    {"key": "basic", "name": "Task tracking", "domain": "General", "kind": "standard", "description": "Tasks, milestones, decisions, action items and risks. A sensible start for any team.", "item_types": ["task", "milestone", "decision", "action_item", "risk"], "default_type": "task"},
+    {"key": "software", "name": "Software delivery", "domain": "Software engineering", "kind": "standard", "description": "Epics, stories, tasks and bugs on a backlog-to-done board, with cycles for sprints.", "item_types": ["epic", "story", "task", "bug"], "default_type": "task", "cycles": ["Sprint 1"]},
+    {"key": "engineering-change", "name": "Engineering change control", "domain": "General engineering", "kind": "standard", "description": "Change requests that must be justified, reviewed and approved before implementation and verification.", "item_types": ["change_request", "task", "risk", "action_item", "decision"], "default_type": "change_request"},
+    {"key": "research", "name": "Research program", "domain": "Science", "kind": "standard", "description": "Experiments from hypothesis to result, with supporting tasks and recorded decisions.", "item_types": ["experiment", "task", "decision", "risk"], "default_type": "experiment"},
+    {"key": "management", "name": "Initiatives and decisions", "domain": "Management", "kind": "standard", "description": "Strategic initiatives, milestones, decisions, action items and a risk register.", "item_types": ["initiative", "milestone", "decision", "action_item", "risk"], "default_type": "action_item"},
+    {"key": "finance", "name": "Finance approvals and close", "domain": "Finance", "kind": "standard", "description": "Period-close tasks and approvals with a named approver.", "item_types": ["approval", "task"], "default_type": "task"},
+    {"key": "legal", "name": "Legal matters", "domain": "Legal", "kind": "standard", "description": "Matters and contract reviews from intake to execution.", "item_types": ["matter", "contract_review", "task"], "default_type": "matter"},
+    {"key": "logistics", "name": "Shipments", "domain": "Logistics", "kind": "standard", "description": "Shipments from planning to delivery, with exceptions tracked alongside.", "item_types": ["shipment", "logistics_exception", "task"], "default_type": "shipment"},
+    {"key": "procurement", "name": "Purchasing", "domain": "Procurement", "kind": "standard", "description": "Purchase requests through approval, ordering and receipt, plus vendor evaluations.", "item_types": ["purchase_request", "vendor_evaluation", "task"], "default_type": "purchase_request"},
+    {"key": "safety", "name": "Safety management", "domain": "Safety", "kind": "standard", "description": "Incident reports, hazards, corrective actions and inspections.", "item_types": ["incident_report", "hazard", "corrective_action", "inspection"], "default_type": "incident_report"},
+    {
+      "key": "it-service-desk", "name": "IT service desk", "domain": "Service desk", "kind": "service_desk",
+      "description": "A portal for staff, queues for agents, response and resolution targets, and a linked knowledge base.",
+      "item_types": ["service_request", "incident", "problem", "change_request"], "default_type": "service_request", "portal_open": true,
+      "request_types": [
+        {"name": "Something is broken", "description": "Report a fault with a system, device or service.", "icon": "zap", "type": "incident", "fields": ["affected_system", "impact", "urgency"]},
+        {"name": "Request access", "description": "Ask for access to a system, folder or group.", "icon": "key", "type": "service_request", "fields": ["affected_system"]},
+        {"name": "New hardware or software", "description": "Ask for a device, a license or an installation.", "icon": "laptop", "type": "service_request", "fields": []},
+        {"name": "Ask a question", "description": "Not sure where it belongs? Ask here.", "icon": "help-circle", "type": "service_request", "fields": []}
+      ],
+      "sla": [
+        {"priority": 4, "response_minutes": 15, "resolution_minutes": 240},
+        {"priority": 3, "response_minutes": 60, "resolution_minutes": 480},
+        {"priority": 2, "response_minutes": 240, "resolution_minutes": 1440},
+        {"priority": 1, "response_minutes": 480, "resolution_minutes": 2880}
+      ],
+      "space": {"name": "IT help", "kind": "knowledge_base", "pages": [
+        {"title": "Welcome to IT help", "body": "Short answers to common questions live here. Agents: publish an article whenever you answer the same question twice.\n", "customer_visible": true},
+        {"title": "How to reset your password", "template": "kb-how-to", "customer_visible": true}
+      ]}
+    },
+    {
+      "key": "business-service-desk", "name": "Business service desk", "domain": "Service desk", "kind": "service_desk",
+      "description": "For HR, facilities, finance or legal intake: a portal, queues and targets without IT terminology.",
+      "item_types": ["service_request", "task"], "default_type": "service_request", "portal_open": true,
+      "request_types": [
+        {"name": "General request", "description": "Tell us what you need.", "icon": "help-circle", "type": "service_request", "fields": []},
+        {"name": "Report a problem", "description": "Something needs fixing.", "icon": "alert-triangle", "type": "service_request", "fields": ["location"]}
+      ],
+      "sla": [
+        {"priority": 4, "response_minutes": 60, "resolution_minutes": 480},
+        {"priority": 3, "response_minutes": 240, "resolution_minutes": 1440},
+        {"priority": 2, "response_minutes": 480, "resolution_minutes": 2880},
+        {"priority": 1, "response_minutes": 960, "resolution_minutes": 5760}
+      ]
+    }
+  ],
+  "page_templates": [
+    {"key": "blank", "name": "Blank page", "category": "General", "description": "Start from nothing.", "body": ""},
+    {"key": "meeting-notes", "name": "Meeting notes", "category": "General", "description": "Agenda, notes, decisions and actions.", "body": "## Details\n\n- **Date:** \n- **Attendees:** \n\n## Agenda\n\n1. \n\n## Notes\n\n\n## Decisions\n\n- \n\n## Actions\n\n- [ ] Owner — action — due date\n"},
+    {"key": "decision-record", "name": "Decision record", "category": "General", "description": "Context, options, decision and consequences.", "body": "## Status\n\nProposed\n\n## Context\n\nWhat is the issue that motivates this decision?\n\n## Options considered\n\n| Option | For | Against |\n|---|---|---|\n|  |  |  |\n\n## Decision\n\n\n## Consequences\n\nWhat becomes easier or harder because of this decision?\n"},
+    {"key": "project-brief", "name": "Project brief", "category": "Management", "description": "Purpose, scope, people, schedule and risks on one page.", "body": "## Purpose\n\nWhy this project exists and what success looks like.\n\n## Scope\n\n**In scope**\n\n- \n\n**Out of scope**\n\n- \n\n## People\n\n| Role | Name |\n|---|---|\n| Sponsor |  |\n| Lead |  |\n\n## Milestones\n\n| Milestone | Date |\n|---|---|\n|  |  |\n\n## Risks and assumptions\n\n- \n"},
+    {"key": "status-report", "name": "Status report", "category": "Management", "description": "Progress, next steps, risks and decisions needed.", "body": "## Summary\n\nOne paragraph: on track, at risk or off track, and why.\n\n## Completed since last report\n\n- \n\n## Planned next\n\n- \n\n## Risks and issues\n\n| Item | Impact | Action | Owner |\n|---|---|---|---|\n|  |  |  |  |\n\n## Decisions needed\n\n- \n"},
+    {"key": "design-doc", "name": "Design document", "category": "Engineering", "description": "Problem, goals, design, alternatives and rollout.", "body": "## Problem\n\n\n## Goals and non-goals\n\n- Goal: \n- Non-goal: \n\n## Design\n\n```mermaid\nflowchart LR\n  A[Client] --> B[Service] --> C[(Database)]\n```\n\n## Alternatives considered\n\n\n## Test and rollout plan\n\n\n## Open questions\n\n- \n"},
+    {"key": "requirements-spec", "name": "Requirements specification", "category": "Engineering", "description": "Numbered, verifiable requirements with rationale.", "body": "## Purpose and scope\n\n\n## Definitions\n\n\n## Requirements\n\n| ID | Requirement (shall statement) | Rationale | Verification method |\n|---|---|---|---|\n| R-001 |  |  | Test / Analysis / Inspection / Demonstration |\n\n## Open items\n\n- \n"},
+    {"key": "runbook", "name": "Runbook", "category": "Operations", "description": "How to operate or recover a system, step by step.", "body": "## When to use this\n\n\n## Before you start\n\n- Access needed: \n- Expected duration: \n\n## Steps\n\n1. \n2. \n\n## Verify\n\nHow to confirm it worked.\n\n## Roll back\n\n\n## Escalate\n\nWho to contact if this does not work.\n"},
+    {"key": "postmortem", "name": "Incident review", "category": "Operations", "description": "Blameless review: what happened, why, and what changes.", "body": "## Summary\n\n\n## Impact\n\n- Who was affected: \n- Duration: \n\n## Timeline\n\n| Time | Event |\n|---|---|\n|  |  |\n\n## Contributing causes\n\n\n## What went well\n\n\n## Actions\n\n| Action | Owner | Work item |\n|---|---|---|\n|  |  |  |\n"},
+    {"key": "sop", "name": "Standard operating procedure", "category": "Operations", "description": "Purpose, responsibilities and a controlled procedure.", "body": "## Purpose\n\n\n## Scope\n\n\n## Responsibilities\n\n| Role | Responsibility |\n|---|---|\n|  |  |\n\n## Procedure\n\n1. \n\n## Records\n\nWhat must be recorded, and where.\n\n## Revision history\n\nKept automatically in the page history.\n"},
+    {"key": "kb-how-to", "name": "How-to article", "category": "Knowledge base", "description": "A short answer to one question.", "body": "## What this covers\n\nOne sentence saying who this is for and what they will be able to do.\n\n## Steps\n\n1. \n2. \n3. \n\n## If it does not work\n\n- \n\n## Still stuck?\n\nRaise a request through the portal and mention this article.\n"},
+    {"key": "kb-troubleshooting", "name": "Troubleshooting article", "category": "Knowledge base", "description": "Symptom, cause and fix.", "body": "## Symptom\n\nWhat the person sees, in their words.\n\n## Cause\n\n\n## Fix\n\n1. \n\n## Prevent it\n\n"}
+  ]
+}

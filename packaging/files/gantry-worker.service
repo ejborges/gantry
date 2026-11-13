@@ -1,0 +1,53 @@
+[Unit]
+Description=Gantry background worker (notifications, deliveries, indexing, imports)
+Documentation=file:///usr/share/gantry/manual/sysadmin/index.html
+After=network-online.target postgresql.service gantry.service
+Wants=network-online.target
+# Refuse to start half-configured: gantry-setup creates the key.
+ConditionPathExists=/etc/gantry/secret.key
+
+[Service]
+Type=exec
+User=gantry
+Group=gantry
+ExecStart=/usr/bin/gantry worker
+Restart=on-failure
+RestartSec=3
+TimeoutStartSec=300
+TimeoutStopSec=30
+LimitNOFILE=65536
+SyslogIdentifier=gantry-worker
+UMask=0027
+
+# The server needs its state directory, the database socket and the network. Nothing else.
+StateDirectory=gantry
+StateDirectoryMode=0750
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+# AF_NETLINK lets the C library ask which address families this machine has when resolving names.
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+# A call outside the filter fails with "operation not permitted" instead of killing the service.
+SystemCallErrorNumber=EPERM
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+[Install]
+WantedBy=multi-user.target

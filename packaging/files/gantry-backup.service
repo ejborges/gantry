@@ -1,0 +1,10 @@
+[Unit]
+Description=Back up Gantry (database, attachments, configuration)
+Documentation=file:///usr/share/gantry/manual/sysadmin/backup.html
+After=postgresql.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/gantry-backup
+Nice=10
+IOSchedulingClass=idle

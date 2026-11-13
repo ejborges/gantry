@@ -1,0 +1,13 @@
+[package]
+name = "gantry-mcp"
+description = "Gantry MCP stdio bridge: lets desktop MCP clients talk to a Gantry server over stdio"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+tokio = { version = "1", features = ["rt", "macros", "io-std", "io-util"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+serde_json = "1"
+base64 = "0.22"

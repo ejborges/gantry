@@ -1,0 +1,4 @@
+#Type Path                    Mode User   Group  Age
+d     /var/lib/gantry         0750 gantry gantry -
+d     /var/lib/gantry/blobs   0750 gantry gantry -
+d     /var/backups/gantry     0700 root   root   -

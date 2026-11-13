@@ -1,0 +1,168 @@
+#!/usr/bin/bash
+# First-time setup of Gantry on one server. Safe to run again: every step checks
+# what is already there and only does what is missing.
+#
+#   gantry-setup --hostname gantry.example.org --admin-email you@example.org
+#
+# Options
+#   --hostname NAME        the name people will type (default: this machine's full name)
+#   --admin-email EMAIL    create the first system administrator with this address
+#   --admin-name "NAME"    their display name (default: Administrator)
+#   --cert FILE --key FILE use this TLS certificate chain and private key
+#                          (default: create a self-signed pair so the service starts)
+#   --no-database          do not install or configure PostgreSQL here; database.url in
+#                          /etc/gantry/gantry.toml must already point at a prepared database
+#   --no-nginx             do not configure nginx (another proxy terminates TLS)
+#   --no-firewall          do not open ports 80 and 443 in firewalld
+#   --no-start             prepare everything but leave the services stopped
+#   -h, --help
+set -euo pipefail
+
+say()  { printf '\n==> %s\n' "$*"; }
+note() { printf '    %s\n' "$*"; }
+die()  { printf 'gantry-setup: %s\n' "$*" >&2; exit 1; }
+as_gantry()   { runuser -u gantry -- "$@"; }
+as_postgres() { runuser -u postgres -- "$@"; }
+
+HOSTNAME_ARG="" ADMIN_EMAIL="" ADMIN_NAME="Administrator" CERT="" KEY=""
+DO_DB=1 DO_NGINX=1 DO_FIREWALL=1 DO_START=1
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --hostname)     HOSTNAME_ARG="${2:?--hostname needs a value}"; shift 2 ;;
+    --admin-email)  ADMIN_EMAIL="${2:?--admin-email needs a value}"; shift 2 ;;
+    --admin-name)   ADMIN_NAME="${2:?--admin-name needs a value}"; shift 2 ;;
+    --cert)         CERT="${2:?--cert needs a file}"; shift 2 ;;
+    --key)          KEY="${2:?--key needs a file}"; shift 2 ;;
+    --no-database)  DO_DB=0; shift ;;
+    --no-nginx)     DO_NGINX=0; shift ;;
+    --no-firewall)  DO_FIREWALL=0; shift ;;
+    --no-start)     DO_START=0; shift ;;
+    -h|--help)      sed -n '2,/^set -euo/p' "$0" | sed -e '$d' -e 's/^# \{0,1\}//'; exit 0 ;;
+    *)              die "unknown option $1 (try --help)" ;;
+  esac
+done
+
+[ "$(id -u)" = 0 ] || die "run as root"
+[ -x /usr/bin/gantry ] || die "/usr/bin/gantry is missing; install the gantry package first"
+{ [ -z "$CERT" ] && [ -z "$KEY" ]; } || { [ -r "$CERT" ] && [ -r "$KEY" ]; } || die "--cert and --key must both name readable files"
+HOST="${HOSTNAME_ARG:-$(hostname -f 2>/dev/null || hostname)}"
+case "$HOST" in *[!A-Za-z0-9.-]*|"") die "'$HOST' is not a usable host name; pass --hostname" ;; esac
+CONF=/etc/gantry/gantry.toml
+KEYFILE=/etc/gantry/secret.key
+ADMIN_PASSWORD=""
+
+# ── 1. database ──────────────────────────────────────────────────────────────
+if [ "$DO_DB" = 1 ]; then
+  say "PostgreSQL"
+  PGDATA_DIR="${PGDATA:-/var/lib/pgsql/data}"
+  if [ ! -f "$PGDATA_DIR/PG_VERSION" ]; then
+    note "initializing a new database cluster in $PGDATA_DIR"
+    postgresql-setup --initdb >/dev/null
+  fi
+  systemctl enable --now postgresql.service
+  for _ in $(seq 1 30); do as_postgres pg_isready -q && break; sleep 1; done
+  as_postgres pg_isready -q || die "PostgreSQL did not start; see: journalctl -u postgresql"
+  SERVER_VERSION="$(as_postgres psql -XtAc 'SHOW server_version_num')"
+  [ "$SERVER_VERSION" -ge 160000 ] || die "PostgreSQL 16 or newer is required (found $(as_postgres psql -XtAc 'SHOW server_version')). On Enterprise Linux 9 run: dnf module switch-to postgresql:16"
+  if [ "$(as_postgres psql -XtAc "SELECT 1 FROM pg_roles WHERE rolname = 'gantry'")" != 1 ]; then
+    note "creating database role gantry (signs in through the local socket as the gantry system account; no password)"
+    as_postgres createuser gantry
+  fi
+  if [ "$(as_postgres psql -XtAc "SELECT 1 FROM pg_database WHERE datname = 'gantry'")" != 1 ]; then
+    note "creating database gantry"
+    as_postgres createdb --owner=gantry --encoding=UTF8 --template=template0 gantry
+  fi
+  as_postgres psql -Xq -d gantry -v ON_ERROR_STOP=1 -c 'CREATE EXTENSION IF NOT EXISTS pg_trgm' >/dev/null
+  if [ "$(as_postgres psql -XtAc "SELECT 1 FROM pg_available_extensions WHERE name = 'vector'")" = 1 ]; then
+    as_postgres psql -Xq -d gantry -v ON_ERROR_STOP=1 -c 'CREATE EXTENSION IF NOT EXISTS vector' >/dev/null
+    note "pgvector is available and enabled in the database"
+  fi
+  note "ready: $(as_postgres psql -XtAc 'SHOW server_version')"
+else
+  say "PostgreSQL: skipped (--no-database); using database.url from $CONF"
+fi
+
+# ── 2. secret key and public address ─────────────────────────────────────────
+say "Configuration"
+if [ ! -s "$KEYFILE" ]; then
+  (umask 077; /usr/bin/gantry config generate-key > "$KEYFILE")
+  note "created $KEYFILE. Back this file up: it encrypts stored integration and single sign-on secrets"
+fi
+chown root:gantry "$KEYFILE"; chmod 0640 "$KEYFILE"
+if grep -Eq '^public_url *= *""' "$CONF"; then
+  sed -i -E "s|^public_url *= *\"\"|public_url = \"https://$HOST\"|" "$CONF"
+  note "server.public_url set to https://$HOST"
+else
+  note "server.public_url left as it is: $(grep -E '^public_url' "$CONF" | head -1)"
+fi
+as_gantry /usr/bin/gantry config check >/dev/null || die "the configuration is not valid; run: gantry config check"
+
+# ── 3. schema and first administrator ────────────────────────────────────────
+say "Database schema"
+as_gantry /usr/bin/gantry migrate | sed 's/^/    /'
+if [ -n "$ADMIN_EMAIL" ]; then
+  say "Administrator"
+  OUT="$(as_gantry /usr/bin/gantry admin create --email "$ADMIN_EMAIL" --name "$ADMIN_NAME" --generate 2>&1)" && {
+    ADMIN_PASSWORD="$(printf '%s\n' "$OUT" | sed -n 's/^Password (shown once[^:]*): //p')"
+    note "created $ADMIN_EMAIL"
+  } || {
+    case "$OUT" in
+      *duplicate*|*already*) note "$ADMIN_EMAIL already exists; left unchanged (reset with: gantry admin reset-password --email $ADMIN_EMAIL)" ;;
+      *) printf '%s\n' "$OUT" >&2; die "could not create the administrator" ;;
+    esac
+  }
+fi
+
+# ── 4. TLS and nginx ─────────────────────────────────────────────────────────
+if [ "$DO_NGINX" = 1 ]; then
+  say "nginx"
+  if [ -z "$CERT" ]; then
+    CERT=/etc/pki/tls/certs/gantry.crt KEY=/etc/pki/tls/private/gantry.key
+    if [ ! -s "$CERT" ] || [ ! -s "$KEY" ]; then
+      (umask 077; openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -days 397 \
+        -subj "/CN=$HOST" -addext "subjectAltName=DNS:$HOST" -keyout "$KEY" -out "$CERT" 2>/dev/null)
+      chmod 0644 "$CERT"
+      SELF_SIGNED=1
+      note "created a self-signed certificate for $HOST (browsers will warn until you replace it)"
+    fi
+  fi
+  # The site is written by the same helper that refreshes it after a package upgrade.
+  [ -e /proc/net/if_inet6 ] || note "IPv6 is off on this machine; listening on IPv4 only"
+  /usr/libexec/gantry/nginx-site render "$HOST" "$CERT" "$KEY"
+  if command -v selinuxenabled >/dev/null && selinuxenabled; then
+    # nginx may only reach the application port when this boolean is on.
+    [ "$(getsebool httpd_can_network_connect | awk '{print $3}')" = on ] || { setsebool -P httpd_can_network_connect 1; note "SELinux: allowed nginx to connect to the application (httpd_can_network_connect)"; }
+    restorecon -R /etc/nginx/conf.d /etc/pki/tls/certs/gantry.crt /etc/pki/tls/private/gantry.key 2>/dev/null || true
+  fi
+  nginx -t 2>&1 | sed 's/^/    /' || die "nginx rejected its configuration"
+else
+  say "nginx: skipped (--no-nginx)"
+fi
+
+if [ "$DO_FIREWALL" = 1 ] && [ "$DO_NGINX" = 1 ] && command -v firewall-cmd >/dev/null && firewall-cmd --state >/dev/null 2>&1; then
+  say "Firewall"
+  firewall-cmd --quiet --permanent --add-service=http --add-service=https
+  firewall-cmd --quiet --reload
+  note "opened http (redirect only) and https"
+fi
+
+# ── 5. start ─────────────────────────────────────────────────────────────────
+if [ "$DO_START" = 1 ]; then
+  say "Starting services"
+  systemctl enable gantry.service >/dev/null 2>&1
+  systemctl restart gantry.service
+  for _ in $(seq 1 60); do curl -fsS -o /dev/null http://127.0.0.1:8600/readyz 2>/dev/null && break; sleep 1; done
+  curl -fsS -o /dev/null http://127.0.0.1:8600/readyz || die "Gantry did not become ready; see: journalctl -u gantry -n 50"
+  if [ "$DO_NGINX" = 1 ]; then systemctl enable nginx.service >/dev/null 2>&1; systemctl reload-or-restart nginx.service; fi
+  as_gantry /usr/bin/gantry doctor | sed 's/^/    /' || true
+fi
+
+say "Gantry is set up"
+note "Address:        https://$HOST/"
+note "Manual:         https://$HOST/manual/"
+[ -z "$ADMIN_EMAIL" ] || note "Administrator:  $ADMIN_EMAIL"
+[ -z "$ADMIN_PASSWORD" ] || { note "Password:       $ADMIN_PASSWORD"; note "                (shown once; sign in and change it under Profile)"; }
+[ -n "$ADMIN_EMAIL" ] || note "No administrator was requested. Create one with: gantry-setup --admin-email you@example.org"
+[ -z "${SELF_SIGNED:-}" ] || note "Certificate:    self-signed. Install a real one: gantry-setup --hostname $HOST --cert FILE --key FILE"
+note "Logs:           journalctl -u gantry -f"
+note "Nightly backup: systemctl enable --now gantry-backup.timer"

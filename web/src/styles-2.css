@@ -1,0 +1,1040 @@
+/* Gantry 0.2: people, discussion, the Markdown editor and what Markdown can show,
+   planning and analytics. Loaded after styles.css and built on its tokens. */
+
+:root {
+  /* Series colors for charts, in a fixed order. The order is what keeps neighbors apart
+     for people with color vision deficiency; both sets pass the palette check (lightness
+     band, chroma, separation between neighbors) against the surface of their theme. */
+  --viz-1: #2a78d6;
+  --viz-2: #eb6834;
+  --viz-3: #1baf7a;
+  --viz-4: #eda100;
+  --viz-5: #e87ba4;
+  --viz-6: #008300;
+  --viz-7: #6250d6;
+  --viz-8: #e34948;
+  --viz-grid: #e3e7ed;
+  --agent: var(--purple);
+  --agent-soft: var(--purple-soft);
+}
+:root[data-theme="dark"] {
+  --viz-1: #3987e5;
+  --viz-2: #d95926;
+  --viz-3: #199e70;
+  --viz-4: #c98500;
+  --viz-5: #d55181;
+  --viz-6: #008300;
+  --viz-7: #9085e9;
+  --viz-8: #e66767;
+  --viz-grid: #26313d;
+}
+
+/* ───────── people ───────── */
+.avatar {
+  position: relative;
+  overflow: visible;
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  display: block;
+}
+.avatar.sm {
+  width: 20px;
+  height: 20px;
+  font-size: 9.5px;
+}
+.avatar.lg {
+  width: 40px;
+  height: 40px;
+  font-size: 15px;
+}
+.avatar.xl {
+  width: 96px;
+  height: 96px;
+  font-size: 32px;
+}
+.avatar.lg > svg,
+.avatar.xl > svg {
+  width: 50%;
+  height: 50%;
+}
+/* An AI agent: a squared picture with a robot mark, never a plain circle. */
+.avatar.agent {
+  border-radius: 28%;
+  box-shadow: 0 0 0 1.5px var(--agent);
+}
+.avatar-mark {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: grid;
+  place-items: center;
+  width: 58%;
+  height: 58%;
+  min-width: 12px;
+  min-height: 12px;
+  border-radius: 50%;
+  background: var(--agent);
+  color: #fff;
+  box-shadow: 0 0 0 1.5px var(--surface);
+}
+:root[data-theme="dark"] .avatar-mark {
+  color: #150c2b;
+}
+.avatar-mark svg {
+  width: 72%;
+  height: 72%;
+}
+.presence-dot {
+  position: absolute;
+  right: -2px;
+  top: -2px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px var(--surface);
+  background: var(--faint);
+}
+.presence-dot.away {
+  background: var(--warn-solid);
+}
+.presence-dot.busy {
+  background: var(--danger);
+}
+.presence-dot.out_of_office {
+  background: var(--surface);
+  box-shadow: 0 0 0 1.5px var(--surface), inset 0 0 0 2px var(--faint);
+}
+.badge.agent {
+  height: 18px;
+  padding: 0 6px;
+  background: var(--agent-soft);
+  color: var(--agent);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.badge.agent svg {
+  width: 11px;
+  height: 11px;
+}
+.person-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.peers {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  vertical-align: middle;
+}
+.peer {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1.5px var(--action);
+}
+.peer-at {
+  padding-right: 7px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--action);
+  white-space: nowrap;
+}
+.props dt .peers {
+  margin-left: 4px;
+}
+.watchers {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+/* ───────── waiting ───────── */
+.slow {
+  display: grid;
+  gap: 8px;
+  max-width: 460px;
+  padding: 18px 0;
+}
+.slow-title {
+  font-weight: 600;
+}
+.progress {
+  position: relative;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--sunken);
+  overflow: hidden;
+}
+.progress span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 34%;
+  border-radius: 2px;
+  background: var(--action);
+  animation: progress-slide 1.6s ease-in-out infinite;
+}
+@keyframes progress-slide {
+  0% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(310%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress span {
+    animation: none;
+    width: 100%;
+    opacity: 0.45;
+  }
+}
+
+/* ───────── calendar ───────── */
+.calendar {
+  width: 262px;
+  padding: 10px;
+}
+.calendar-head,
+.calendar-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.calendar-foot {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+.calendar-grid {
+  margin-top: 6px;
+}
+.calendar-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.calendar-dow {
+  height: 24px;
+  display: grid;
+  place-items: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.calendar-day {
+  height: 32px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.calendar-day:hover:not(:disabled) {
+  background: var(--sunken);
+}
+.calendar-day.outside {
+  color: var(--faint);
+}
+.calendar-day[aria-current="date"] {
+  box-shadow: inset 0 0 0 1.5px var(--action);
+  font-weight: 600;
+}
+.calendar-day[aria-selected="true"] {
+  background: var(--action);
+  color: var(--on-action);
+  font-weight: 600;
+}
+.calendar-day:disabled {
+  color: var(--faint);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.menu.pop {
+  padding: 0;
+  min-width: 0;
+}
+
+/* ───────── differences ───────── */
+.diff {
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  overflow: hidden;
+}
+.diff-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+.diff-count.add {
+  color: var(--done);
+}
+.diff-count.del {
+  color: var(--danger);
+}
+.diff-scroll {
+  overflow: auto;
+  max-height: 62vh;
+}
+.diff-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font: 12.5px/1.55 var(--mono);
+}
+.diff-table th {
+  position: sticky;
+  top: 0;
+  padding: 4px 10px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  font: 600 12px var(--font);
+  color: var(--muted);
+}
+.diff-table col.diff-col-n {
+  width: 46px;
+}
+.diff-n {
+  width: 46px;
+  padding: 0 8px;
+  text-align: right;
+  color: var(--faint);
+  user-select: none;
+  vertical-align: top;
+  font-variant-numeric: tabular-nums;
+}
+.diff-text {
+  padding: 0 10px 0 4px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+.diff-table.split td:nth-child(2) {
+  border-right: 1px solid var(--line);
+}
+.diff-sign {
+  display: inline-block;
+  width: 14px;
+  color: var(--muted);
+  user-select: none;
+}
+.diff-text.add,
+.diff-n.add {
+  background: var(--done-soft);
+}
+.diff-text.del,
+.diff-n.del {
+  background: var(--danger-soft);
+}
+.diff-text.add .diff-sign {
+  color: var(--done);
+}
+.diff-text.del .diff-sign {
+  color: var(--danger);
+}
+.diff-text ins {
+  background: color-mix(in srgb, var(--done) 28%, transparent);
+  text-decoration: none;
+  border-radius: 2px;
+}
+.diff-text del {
+  background: color-mix(in srgb, var(--danger) 26%, transparent);
+  text-decoration: line-through;
+  border-radius: 2px;
+}
+.diff-text.diff-none {
+  background: repeating-linear-gradient(-45deg, transparent 0 6px, var(--sunken) 6px 7px);
+}
+.diff-gap td {
+  padding: 2px 8px;
+  background: var(--surface-2);
+  border-block: 1px solid var(--line);
+  text-align: center;
+}
+
+/* ───────── the Markdown editor ───────── */
+.md-editor .md-panes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.md-editor.mode-split .md-panes {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.md-editor .md-source[hidden] {
+  display: none;
+}
+.md-editor .cm-editor {
+  min-height: 300px;
+  max-height: 70vh;
+  font: 13.5px/1.6 var(--mono);
+  background: var(--surface);
+  color: var(--ink);
+}
+.md-editor.compact .cm-editor {
+  min-height: 92px;
+  max-height: 46vh;
+}
+.md-editor .cm-editor.cm-focused {
+  outline: none;
+}
+.md-editor .cm-scroller {
+  font-family: var(--mono);
+}
+.md-editor .cm-content {
+  padding: 10px 0;
+}
+.md-editor.compact .cm-line {
+  padding: 0 12px;
+}
+.md-editor .cm-gutters {
+  background: var(--surface-2);
+  color: var(--faint);
+  border-right: 1px solid var(--line);
+}
+.md-editor .cm-activeLine,
+.md-editor .cm-activeLineGutter {
+  background: color-mix(in srgb, var(--action-soft) 55%, transparent);
+}
+.md-editor .cm-cursor {
+  border-left-color: var(--ink);
+}
+.md-editor .cm-selectionBackground,
+.md-editor .cm-focused .cm-selectionBackground {
+  background: var(--action-soft) !important;
+}
+.md-editor .cm-placeholder {
+  color: var(--faint);
+}
+.md-editor .cm-tooltip {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-pop);
+  font: 13px var(--font);
+}
+.md-editor .cm-tooltip-autocomplete ul li {
+  padding: 5px 10px;
+}
+.md-editor .cm-tooltip-autocomplete ul li[aria-selected] {
+  background: var(--action);
+  color: var(--on-action);
+}
+.md-editor .cm-completionDetail {
+  margin-left: 10px;
+  font-style: normal;
+  opacity: 0.75;
+}
+/* Other people's cursors while editing together. */
+.md-editor .cm-ySelectionInfo {
+  padding: 1px 5px;
+  border-radius: 4px 4px 4px 0;
+  font: 600 11px var(--font);
+  opacity: 1;
+  top: -1.5em;
+}
+.md-editor .preview {
+  padding: 14px 18px;
+  overflow: auto;
+  max-height: 70vh;
+  min-width: 0;
+}
+.md-editor.mode-split .preview {
+  border-left: 1px solid var(--line);
+}
+.md-editor.compact .preview {
+  padding: 10px 12px;
+  max-height: 46vh;
+}
+.md-foot {
+  padding: 5px 10px;
+  border-top: 1px solid var(--line);
+  background: var(--surface-2);
+}
+.toolbar .mode-switch button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 8px;
+}
+.toolbar .mode-switch svg,
+.diff-head .mode-switch svg {
+  width: 14px;
+  height: 14px;
+}
+.diff-head .mode-switch button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+@media (max-width: 860px) {
+  /* Both at once, one above the other. */
+  .md-editor.mode-split .md-panes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .md-editor.mode-split .preview {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .md-editor .cm-editor {
+    min-height: 200px;
+    max-height: 42vh;
+  }
+}
+
+/* ───────── discussion and history ───────── */
+.day-sep {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 2px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.day-sep::before,
+.day-sep::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.comment.removed {
+  opacity: 0.75;
+}
+.comment header time {
+  font-variant-numeric: tabular-nums;
+}
+.writing {
+  min-height: 18px;
+  margin: 4px 0;
+}
+.history-list {
+  list-style: none;
+  margin: 8px 0;
+  padding: 0;
+}
+.history-list .timeline-row {
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-2);
+}
+.history-list .timeline-row > time {
+  width: 190px;
+  flex: none;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.history-list .badge {
+  height: 19px;
+  vertical-align: middle;
+}
+@media (max-width: 720px) {
+  .history-list .timeline-row {
+    flex-direction: column;
+    gap: 2px;
+  }
+  .history-list .timeline-row > time {
+    width: auto;
+  }
+}
+.file-row .thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-sm);
+  object-fit: cover;
+  background: var(--sunken);
+  flex: none;
+}
+
+/* ───────── what Markdown shows ───────── */
+.prose .mention {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--action-soft);
+  color: var(--action);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.prose .mention.agent {
+  background: var(--agent-soft);
+  color: var(--agent);
+}
+.prose .mention.agent::after {
+  content: " (AI agent)";
+  font-size: 0.82em;
+  font-weight: 600;
+}
+.prose .ref {
+  font-weight: 500;
+}
+.prose .ref-item {
+  font-family: var(--mono);
+  font-size: 0.92em;
+  white-space: nowrap;
+}
+.prose .ref-item[data-status="done"] {
+  text-decoration: line-through;
+  text-decoration-color: var(--faint);
+}
+.prose .ref-item.card {
+  display: flex;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  font: inherit;
+  white-space: normal;
+  text-decoration: none;
+}
+.prose .unresolved {
+  border-bottom: 1px dashed var(--faint);
+  color: var(--muted);
+}
+.prose .tag {
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--sunken);
+  color: var(--ink-2);
+  font-size: 0.92em;
+}
+.prose .chip {
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--sunken);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.prose mark {
+  padding: 0 2px;
+  border-radius: 2px;
+  background: var(--warn-soft);
+  color: inherit;
+}
+.prose ins,
+.prose .diff-add {
+  background: var(--done-soft);
+  text-decoration: none;
+}
+.prose del.diff-del {
+  background: var(--danger-soft);
+}
+.prose kbd {
+  padding: 1px 5px;
+  border: 1px solid var(--line-strong);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  font: 0.88em var(--mono);
+}
+.prose details {
+  margin: 0.7em 0;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+.prose summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.prose .frontmatter {
+  background: var(--surface-2);
+  font-size: 0.92em;
+}
+.prose .swatch {
+  display: inline-block;
+  width: 0.85em;
+  height: 0.85em;
+  margin-left: 4px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px var(--line-strong);
+  vertical-align: middle;
+}
+.prose .callout {
+  margin: 0.8em 0;
+  padding: 10px 14px;
+  border: 0;
+  border-left: 3px solid var(--action);
+  border-radius: var(--r-sm);
+  background: var(--action-soft);
+  color: var(--ink);
+}
+/* The title and the text under it read as one block, not as two paragraphs. */
+.prose .callout > p {
+  margin: 0.35em 0;
+}
+.prose .callout > :first-child {
+  margin-top: 0;
+}
+.prose .callout > :last-child {
+  margin-bottom: 0;
+}
+.prose .callout-title {
+  display: block;
+  margin-bottom: 2px;
+  font-weight: 600;
+  color: var(--action);
+}
+.prose .callout-tip,
+.prose .callout-success {
+  border-color: var(--done);
+  background: var(--done-soft);
+}
+.prose .callout-tip .callout-title,
+.prose .callout-success .callout-title {
+  color: var(--done);
+}
+.prose .callout-warning,
+.prose .callout-caution,
+.prose .callout-important,
+.prose .callout-question,
+.prose .callout-todo {
+  border-color: var(--warn-solid);
+  background: var(--warn-soft);
+}
+.prose .callout-warning .callout-title,
+.prose .callout-caution .callout-title,
+.prose .callout-important .callout-title,
+.prose .callout-question .callout-title,
+.prose .callout-todo .callout-title {
+  color: var(--warn);
+}
+.prose .callout-danger,
+.prose .callout-error,
+.prose .callout-bug {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+.prose .callout-danger .callout-title,
+.prose .callout-error .callout-title,
+.prose .callout-bug .callout-title {
+  color: var(--danger);
+}
+.prose .callout-quote,
+.prose .callout-example,
+.prose .callout-abstract,
+.prose .callout-summary {
+  border-color: var(--line-strong);
+  background: var(--surface-2);
+}
+.prose .callout-quote .callout-title,
+.prose .callout-example .callout-title,
+.prose .callout-abstract .callout-title,
+.prose .callout-summary .callout-title {
+  color: var(--ink-2);
+}
+.prose .math-block {
+  display: block;
+  margin: 0.8em 0;
+  text-align: center;
+  overflow-x: auto;
+}
+.prose .math[data-math] {
+  font-family: var(--mono);
+  color: var(--muted);
+}
+.prose math {
+  font-size: 1.12em;
+}
+.prose .toc {
+  margin: 0.8em 0;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface-2);
+}
+.prose .toc ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--r-sm);
+}
+.prose img[width][height] {
+  object-fit: contain;
+}
+.prose video.media {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  border-radius: var(--r);
+  background: #000;
+}
+.prose audio.media {
+  display: block;
+  width: min(100%, 460px);
+}
+.prose .footnotes {
+  margin-top: 1.6em;
+  padding-top: 0.6em;
+  border-top: 1px solid var(--line);
+  font-size: 0.92em;
+  color: var(--ink-2);
+}
+.prose .embed {
+  position: relative;
+  margin: 0.8em 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  overflow: hidden;
+}
+.prose .embed[data-error]::after {
+  content: "This content reported an error: " attr(data-error);
+  display: block;
+  padding: 4px 10px;
+  border-top: 1px solid var(--line);
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: 12px;
+}
+.sandbox-frame {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color-scheme: normal;
+}
+.sandbox-frame.tile {
+  height: 100%;
+}
+.sandbox-frame.flow {
+  height: 80px;
+}
+.prose .embed-diagram {
+  margin: 0.8em 0;
+  overflow-x: auto;
+}
+
+/* ───────── drawn diagrams ───────── */
+svg.diagram {
+  max-width: 100%;
+  height: auto;
+  font: 13px var(--font);
+}
+svg.diagram .shape {
+  fill: var(--surface-2);
+  stroke: var(--line-strong);
+  stroke-width: 1.5;
+}
+svg.diagram .shape.bare {
+  fill: none;
+  stroke: none;
+}
+svg.diagram text {
+  fill: var(--ink);
+}
+svg.diagram .node.blue .shape {
+  fill: var(--progress-soft);
+  stroke: var(--progress);
+}
+svg.diagram .node.green .shape {
+  fill: var(--done-soft);
+  stroke: var(--done);
+}
+svg.diagram .node.amber .shape {
+  fill: var(--warn-soft);
+  stroke: var(--warn-solid);
+}
+svg.diagram .node.red .shape {
+  fill: var(--danger-soft);
+  stroke: var(--danger);
+}
+svg.diagram .node.purple .shape {
+  fill: var(--purple-soft);
+  stroke: var(--purple);
+}
+svg.diagram .node.teal .shape {
+  fill: var(--teal-soft);
+  stroke: var(--teal);
+}
+svg.diagram .edge {
+  stroke: var(--muted);
+  stroke-width: 1.5;
+}
+svg.diagram .edge.dashed {
+  stroke-dasharray: 6 4;
+}
+svg.diagram .arrowhead {
+  fill: var(--muted);
+}
+svg.diagram .edge-label {
+  fill: var(--ink-2);
+  font-size: 12px;
+}
+svg.diagram .edge-label-bg {
+  fill: var(--surface);
+}
+
+/* The diagram editor. */
+.dg .toolbar {
+  border: 1px solid var(--line);
+  border-radius: var(--r) var(--r) 0 0;
+}
+.dg-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 230px;
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-radius: 0 0 var(--r) var(--r);
+  overflow: hidden;
+}
+/* The small shapes on the buttons keep their own proportions (button icons are square). */
+.btn svg.dg-icon {
+  width: 22px;
+  height: 16px;
+  flex: none;
+}
+.dg-canvas {
+  height: min(62vh, 560px);
+  background: var(--surface);
+}
+.dg-side {
+  padding: 12px;
+  border-left: 1px solid var(--line);
+  background: var(--surface-2);
+  overflow: auto;
+}
+.dg-node {
+  position: relative;
+}
+.dg-node svg.diagram {
+  display: block;
+  max-width: none;
+}
+.dg-text {
+  position: absolute;
+  inset: 4px;
+  border: 1px solid var(--action);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font: 13px var(--font);
+  text-align: center;
+  resize: none;
+}
+.dg-edge-label {
+  position: absolute;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 12px;
+  pointer-events: none;
+}
+.react-flow__edge-path.dg-edge {
+  stroke: var(--muted);
+  stroke-width: 1.5;
+}
+.react-flow__edge-path.dg-edge.dashed {
+  stroke-dasharray: 6 4;
+}
+.react-flow__edge-path.dg-edge.selected,
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: var(--action);
+  stroke-width: 2.5;
+}
+.dg-swatch {
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--surface-2);
+  cursor: pointer;
+}
+.dg-swatch.blue {
+  background: var(--progress-soft);
+  border-color: var(--progress);
+}
+.dg-swatch.green {
+  background: var(--done-soft);
+  border-color: var(--done);
+}
+.dg-swatch.amber {
+  background: var(--warn-soft);
+  border-color: var(--warn-solid);
+}
+.dg-swatch.red {
+  background: var(--danger-soft);
+  border-color: var(--danger);
+}
+.dg-swatch.purple {
+  background: var(--purple-soft);
+  border-color: var(--purple);
+}
+.dg-swatch.teal {
+  background: var(--teal-soft);
+  border-color: var(--teal);
+}
+.dg-swatch[aria-checked="true"] {
+  box-shadow: var(--focus);
+}
+/* React Flow in the application's colors, in both themes. */
+.react-flow {
+  --xy-background-color: var(--surface);
+  --xy-background-pattern-color: var(--line);
+  --xy-node-color: var(--ink);
+  --xy-handle-background-color: var(--action);
+  --xy-handle-border-color: var(--surface);
+  --xy-edge-stroke: var(--muted);
+  --xy-edge-stroke-selected: var(--action);
+  --xy-connectionline-stroke: var(--action);
+  --xy-controls-button-background-color: var(--surface);
+  --xy-controls-button-background-color-hover: var(--sunken);
+  --xy-controls-button-color: var(--ink);
+  --xy-controls-button-border-color: var(--line);
+  --xy-minimap-background-color: var(--surface-2);
+  --xy-selection-background-color: color-mix(in srgb, var(--action) 12%, transparent);
+  --xy-selection-border: 1px dashed var(--action);
+  --xy-resize-background-color: var(--action);
+  color: var(--ink);
+}
+.react-flow__handle {
+  width: 9px;
+  height: 9px;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.react-flow__node:hover .react-flow__handle,
+.react-flow__node.selected .react-flow__handle,
+.react-flow__node:focus-visible .react-flow__handle {
+  opacity: 1;
+}
+.react-flow__node:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 3px;
+  border-radius: var(--r-sm);
+}
+@media (max-width: 860px) {
+  .dg-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dg-side {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    max-height: 200px;
+  }
+  .dg-canvas {
+    height: 46vh;
+  }
+}

@@ -1,0 +1,5 @@
+# Installed by gantry-addon-valkey. Rate-limit counters and short-lived state move from
+# PostgreSQL to Valkey on this machine. Point `url` elsewhere to share one Valkey between nodes.
+[storage.kv]
+backend = "valkey"
+url = "valkey://127.0.0.1:6379"

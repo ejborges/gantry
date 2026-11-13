@@ -1,0 +1,1458 @@
+{
+ "id": "nasa",
+ "name": "NASA project management and systems engineering",
+ "version": "0.2.0",
+ "description": "Life-cycle phases, key decision points, life-cycle reviews, requirements with verification, RIDs, waivers, 5x5 risks and document templates structured after NPR 7120.5 and NPR 7123.1. A tailorable starting point, not a substitute for the directives.",
+ "fields": [
+  {
+   "key": "nasa_phase",
+   "name": "Life-cycle phase",
+   "type": "select",
+   "options": [
+    "Pre-Phase A",
+    "Phase A",
+    "Phase B",
+    "Phase C",
+    "Phase D",
+    "Phase E",
+    "Phase F"
+   ]
+  },
+  {
+   "key": "requirement_text",
+   "name": "Requirement (shall statement)",
+   "type": "textarea",
+   "description": "One verifiable statement: The <system> shall <do what> <how well> <under what conditions>."
+  },
+  {
+   "key": "rationale",
+   "name": "Rationale",
+   "type": "textarea",
+   "description": "Why the requirement exists and where its numbers come from."
+  },
+  {
+   "key": "requirement_level",
+   "name": "Requirement level",
+   "type": "select",
+   "options": [
+    "Level 1 (Program)",
+    "Level 2 (Project)",
+    "Level 3 (System)",
+    "Level 4 (Subsystem)",
+    "Level 5 (Component)"
+   ]
+  },
+  {
+   "key": "requirement_source",
+   "name": "Source",
+   "type": "text",
+   "description": "Parent document or directive paragraph."
+  },
+  {
+   "key": "verification_method",
+   "name": "Verification method",
+   "type": "select",
+   "options": [
+    "Test",
+    "Analysis",
+    "Inspection",
+    "Demonstration"
+   ]
+  },
+  {
+   "key": "verification_evidence",
+   "name": "Verification evidence",
+   "type": "textarea",
+   "description": "Report numbers, data locations or links that show compliance."
+  },
+  {
+   "key": "wbs_element",
+   "name": "WBS element",
+   "type": "text"
+  },
+  {
+   "key": "review_type",
+   "name": "Review",
+   "type": "select",
+   "options": [
+    "MCR",
+    "SRR",
+    "MDR",
+    "SDR",
+    "PDR",
+    "CDR",
+    "PRR",
+    "SIR",
+    "TRR",
+    "SAR",
+    "ORR",
+    "FRR",
+    "MRR",
+    "PLAR",
+    "CERR",
+    "PFAR",
+    "DR",
+    "DRR",
+    "Other"
+   ]
+  },
+  {
+   "key": "review_date",
+   "name": "Review date",
+   "type": "date"
+  },
+  {
+   "key": "board_decision",
+   "name": "Board outcome",
+   "type": "select",
+   "options": [
+    "Success criteria met",
+    "Met with actions",
+    "Not met; delta review required"
+   ]
+  },
+  {
+   "key": "kdp_decision",
+   "name": "KDP decision",
+   "type": "select",
+   "options": [
+    "Approved to proceed",
+    "Approved with conditions",
+    "Not approved; rework directed",
+    "Terminated"
+   ]
+  },
+  {
+   "key": "originator_org",
+   "name": "Originating organization",
+   "type": "text"
+  },
+  {
+   "key": "affected_documents",
+   "name": "Affected documents",
+   "type": "textarea"
+  },
+  {
+   "key": "recommended_action",
+   "name": "Recommended action",
+   "type": "textarea"
+  },
+  {
+   "key": "waiver_type",
+   "name": "Request type",
+   "type": "select",
+   "options": [
+    "Waiver",
+    "Deviation",
+    "Tailoring"
+   ],
+   "description": "Deviation: relief sought before the requirement is put under control. Waiver: relief sought afterward. Tailoring: adjusting a prescribed requirement to the project."
+  },
+  {
+   "key": "risk_approach",
+   "name": "Handling approach",
+   "type": "select",
+   "options": [
+    "Mitigate",
+    "Watch",
+    "Research",
+    "Accept",
+    "Elevate",
+    "Close"
+   ]
+  },
+  {
+   "key": "cost_impact",
+   "name": "Cost impact",
+   "type": "text"
+  },
+  {
+   "key": "schedule_impact",
+   "name": "Schedule impact",
+   "type": "text"
+  },
+  {
+   "key": "trl",
+   "name": "Technology readiness level",
+   "type": "select",
+   "options": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ]
+  },
+  {
+   "key": "lesson_recommendation",
+   "name": "Recommendation",
+   "type": "textarea"
+  }
+ ],
+ "workflows": [
+  {
+   "key": "nasa_requirement",
+   "name": "Requirement",
+   "initial": "draft",
+   "statuses": [
+    {
+     "key": "draft",
+     "name": "Draft",
+     "category": "todo"
+    },
+    {
+     "key": "in_review",
+     "name": "In review",
+     "category": "in_progress"
+    },
+    {
+     "key": "baselined",
+     "name": "Baselined",
+     "category": "in_progress"
+    },
+    {
+     "key": "verified",
+     "name": "Verified",
+     "category": "done"
+    },
+    {
+     "key": "withdrawn",
+     "name": "Withdrawn",
+     "category": "done"
+    }
+   ],
+   "transitions": [
+    {
+     "name": "Submit for review",
+     "from": [
+      "draft"
+     ],
+     "to": "in_review",
+     "requires": [
+      "requirement_text",
+      "verification_method"
+     ]
+    },
+    {
+     "name": "Return to author",
+     "from": [
+      "in_review"
+     ],
+     "to": "draft"
+    },
+    {
+     "name": "Baseline",
+     "from": [
+      "in_review"
+     ],
+     "to": "baselined",
+     "requires": [
+      "rationale"
+     ]
+    },
+    {
+     "name": "Record verification",
+     "from": [
+      "baselined"
+     ],
+     "to": "verified",
+     "requires": [
+      "verification_evidence"
+     ]
+    },
+    {
+     "name": "Open change",
+     "from": [
+      "baselined",
+      "verified",
+      "withdrawn"
+     ],
+     "to": "draft"
+    },
+    {
+     "name": "Withdraw",
+     "from": [
+      "draft",
+      "in_review",
+      "baselined"
+     ],
+     "to": "withdrawn"
+    }
+   ]
+  },
+  {
+   "key": "nasa_verification",
+   "name": "Verification activity",
+   "initial": "planned",
+   "statuses": [
+    {
+     "key": "planned",
+     "name": "Planned",
+     "category": "todo"
+    },
+    {
+     "key": "in_progress",
+     "name": "In progress",
+     "category": "in_progress"
+    },
+    {
+     "key": "passed",
+     "name": "Passed",
+     "category": "done"
+    },
+    {
+     "key": "failed",
+     "name": "Failed",
+     "category": "done"
+    }
+   ],
+   "transitions": [
+    {
+     "name": "Start",
+     "from": [
+      "planned",
+      "failed"
+     ],
+     "to": "in_progress"
+    },
+    {
+     "name": "Record pass",
+     "from": [
+      "in_progress"
+     ],
+     "to": "passed",
+     "requires": [
+      "verification_evidence"
+     ]
+    },
+    {
+     "name": "Record failure",
+     "from": [
+      "in_progress"
+     ],
+     "to": "failed"
+    },
+    {
+     "name": "Replan",
+     "from": [
+      "in_progress",
+      "passed",
+      "failed"
+     ],
+     "to": "planned"
+    }
+   ]
+  },
+  {
+   "key": "nasa_review",
+   "name": "Life-cycle review",
+   "initial": "planned",
+   "statuses": [
+    {
+     "key": "planned",
+     "name": "Planned",
+     "category": "todo"
+    },
+    {
+     "key": "readiness",
+     "name": "Readiness assessment",
+     "category": "in_progress"
+    },
+    {
+     "key": "in_review",
+     "name": "Review in progress",
+     "category": "in_progress"
+    },
+    {
+     "key": "closing_actions",
+     "name": "Closing actions",
+     "category": "in_progress"
+    },
+    {
+     "key": "complete",
+     "name": "Complete",
+     "category": "done"
+    }
+   ],
+   "transitions": [
+    {
+     "name": "Begin readiness assessment",
+     "from": [
+      "planned"
+     ],
+     "to": "readiness",
+     "requires": [
+      "review_date"
+     ]
+    },
+    {
+     "name": "Convene review",
+     "from": [
+      "readiness"
+     ],
+     "to": "in_review"
+    },
+    {
+     "name": "Postpone",
+     "from": [
+      "readiness",
+      "in_review"
+     ],
+     "to": "planned"
+    },
+    {
+     "name": "Record board outcome",
+     "from": [
+      "in_review"
+     ],
+     "to": "closing_actions",
+     "requires": [
+      "board_decision"
+     ]
+    },
+    {
+     "name": "Close review",
+     "from": [
+      "closing_actions"
+     ],
+     "to": "complete"
+    },
+    {
+     "name": "Reopen",
+     "from": [
+      "complete"
+     ],
+     "to": "closing_actions"
+    }
+   ]
+  },
+  {
+   "key": "nasa_rid",
+   "name": "Review item discrepancy",
+   "initial": "submitted",
+   "statuses": [
+    {
+     "key": "submitted",
+     "name": "Submitted",
+     "category": "todo"
+    },
+    {
+     "key": "screening",
+     "name": "Screening",
+     "category": "in_progress"
+    },
+    {
+     "key": "accepted",
+     "name": "Accepted",
+     "category": "in_progress"
+    },
+    {
+     "key": "response",
+     "name": "Response in work",
+     "category": "in_progress"
+    },
+    {
+     "key": "closed",
+     "name": "Closed",
+     "category": "done"
+    },
+    {
+     "key": "rejected",
+     "name": "Rejected",
+     "category": "done"
+    },
+    {
+     "key": "withdrawn",
+     "name": "Withdrawn",
+     "category": "done"
+    }
+   ],
+   "transitions": [
+    {
+     "name": "Screen",
+     "from": [
+      "submitted"
+     ],
+     "to": "screening"
+    },
+    {
+     "name": "Accept",
+     "from": [
+      "screening"
+     ],
+     "to": "accepted"
+    },
+    {
+     "name": "Reject",
+     "from": [
+      "screening"
+     ],
+     "to": "rejected"
+    },
+    {
+     "name": "Assign response",
+     "from": [
+      "accepted"
+     ],
+     "to": "response"
+    },
+    {
+     "name": "Close with concurrence",
+     "from": [
+      "response"
+     ],
+     "to": "closed",
+     "requires": [
+      "corrective_action"
+     ]
+    },
+    {
+     "name": "Withdraw",
+     "from": [
+      "submitted",
+      "screening",
+      "accepted",
+      "response"
+     ],
+     "to": "withdrawn"
+    },
+    {
+     "name": "Reopen",
+     "from": [
+      "closed",
+      "rejected",
+      "withdrawn"
+     ],
+     "to": "screening"
+    }
+   ]
+  },
+  {
+   "key": "nasa_kdp",
+   "name": "Key decision point",
+   "initial": "planned",
+   "statuses": [
+    {
+     "key": "planned",
+     "name": "Planned",
+     "category": "todo"
+    },
+    {
+     "key": "readiness",
+     "name": "Readiness review",
+     "category": "in_progress"
+    },
+    {
+     "key": "decided",
+     "name": "Decided",
+     "category": "done"
+    }
+   ],
+   "transitions": [
+    {
+     "name": "Begin readiness review",
+     "from": [
+      "planned"
+     ],
+     "to": "readiness"
+    },
+    {
+     "name": "Record decision",
+     "from": [
+      "readiness"
+     ],
+     "to": "decided",
+     "requires": [
+      "kdp_decision"
+     ]
+    },
+    {
+     "name": "Reconvene",
+     "from": [
+      "decided"
+     ],
+     "to": "readiness"
+    }
+   ]
+  },
+  {
+   "key": "nasa_waiver",
+   "name": "Waiver, deviation or tailoring request",
+   "initial": "draft",
+   "statuses": [
+    {
+     "key": "draft",
+     "name": "Draft",
+     "category": "todo"
+    },
+    {
+     "key": "submitted",
+     "name": "Submitted",
+     "category": "in_progress"
+    },
+    {
+     "key": "approved",
+     "name": "Approved",
+     "category": "done"
+    },
+    {
+     "key": "disapproved",
+     "name": "Disapproved",
+     "category": "done"
+    }
+   ],
+   "transitions": [
+    {
+     "name": "Submit",
+     "from": [
+      "draft"
+     ],
+     "to": "submitted",
+     "requires": [
+      "requirement_source",
+      "justification"
+     ]
+    },
+    {
+     "name": "Return to author",
+     "from": [
+      "submitted"
+     ],
+     "to": "draft"
+    },
+    {
+     "name": "Approve",
+     "from": [
+      "submitted"
+     ],
+     "to": "approved"
+    },
+    {
+     "name": "Disapprove",
+     "from": [
+      "submitted"
+     ],
+     "to": "disapproved"
+    },
+    {
+     "name": "Reopen",
+     "from": [
+      "approved",
+      "disapproved"
+     ],
+     "to": "draft"
+    }
+   ]
+  },
+  {
+   "key": "nasa_product",
+   "name": "Controlled product",
+   "initial": "not_started",
+   "statuses": [
+    {
+     "key": "not_started",
+     "name": "Not started",
+     "category": "todo"
+    },
+    {
+     "key": "draft",
+     "name": "Draft",
+     "category": "in_progress"
+    },
+    {
+     "key": "in_review",
+     "name": "In review",
+     "category": "in_progress"
+    },
+    {
+     "key": "baselined",
+     "name": "Baselined",
+     "category": "done"
+    },
+    {
+     "key": "not_applicable",
+     "name": "Not applicable (tailored out)",
+     "category": "done"
+    }
+   ],
+   "transitions": [
+    {
+     "name": "Start drafting",
+     "from": [
+      "not_started"
+     ],
+     "to": "draft"
+    },
+    {
+     "name": "Submit for review",
+     "from": [
+      "draft"
+     ],
+     "to": "in_review"
+    },
+    {
+     "name": "Return to author",
+     "from": [
+      "in_review"
+     ],
+     "to": "draft"
+    },
+    {
+     "name": "Baseline",
+     "from": [
+      "in_review"
+     ],
+     "to": "baselined"
+    },
+    {
+     "name": "Open update",
+     "from": [
+      "baselined",
+      "not_applicable"
+     ],
+     "to": "draft"
+    },
+    {
+     "name": "Tailor out",
+     "from": [
+      "not_started",
+      "draft"
+     ],
+     "to": "not_applicable",
+     "requires": [
+      "justification"
+     ]
+    }
+   ]
+  }
+ ],
+ "item_types": [
+  {
+   "key": "nasa_requirement",
+   "name": "Requirement",
+   "icon": "list-checks",
+   "color": "blue",
+   "workflow": "nasa_requirement",
+   "description": "A verifiable shall statement with rationale, parent trace and verification method.",
+   "fields": [
+    {
+     "key": "requirement_text"
+    },
+    {
+     "key": "rationale"
+    },
+    {
+     "key": "requirement_level"
+    },
+    {
+     "key": "requirement_source"
+    },
+    {
+     "key": "verification_method"
+    },
+    {
+     "key": "verification_evidence"
+    },
+    {
+     "key": "wbs_element"
+    }
+   ]
+  },
+  {
+   "key": "nasa_verification",
+   "name": "Verification activity",
+   "icon": "clipboard-check",
+   "color": "teal",
+   "workflow": "nasa_verification",
+   "description": "A test, analysis, inspection or demonstration that verifies one or more requirements. Link it to them with the relation `verifies`.",
+   "fields": [
+    {
+     "key": "verification_method",
+     "required": true
+    },
+    {
+     "key": "verification_evidence"
+    },
+    {
+     "key": "wbs_element"
+    },
+    {
+     "key": "nasa_phase"
+    }
+   ]
+  },
+  {
+   "key": "nasa_lcr",
+   "name": "Life-cycle review",
+   "icon": "users",
+   "color": "purple",
+   "workflow": "nasa_review",
+   "description": "A life-cycle or technical review such as SRR, PDR or CDR.",
+   "fields": [
+    {
+     "key": "review_type"
+    },
+    {
+     "key": "review_date"
+    },
+    {
+     "key": "nasa_phase"
+    },
+    {
+     "key": "board_decision"
+    }
+   ]
+  },
+  {
+   "key": "nasa_rid",
+   "name": "RID",
+   "icon": "message-square-warning",
+   "color": "amber",
+   "workflow": "nasa_rid",
+   "description": "Review item discrepancy raised against review material.",
+   "fields": [
+    {
+     "key": "originator_org"
+    },
+    {
+     "key": "affected_documents"
+    },
+    {
+     "key": "recommended_action"
+    },
+    {
+     "key": "corrective_action"
+    }
+   ]
+  },
+  {
+   "key": "nasa_kdp",
+   "name": "Key decision point",
+   "icon": "milestone",
+   "color": "red",
+   "workflow": "nasa_kdp",
+   "description": "The decision authority's gate between life-cycle phases.",
+   "fields": [
+    {
+     "key": "nasa_phase"
+    },
+    {
+     "key": "review_date"
+    },
+    {
+     "key": "kdp_decision"
+    }
+   ]
+  },
+  {
+   "key": "nasa_waiver",
+   "name": "Waiver or deviation",
+   "icon": "file-warning",
+   "color": "amber",
+   "workflow": "nasa_waiver",
+   "description": "A request for relief from, or tailoring of, a requirement.",
+   "fields": [
+    {
+     "key": "waiver_type",
+     "required": true
+    },
+    {
+     "key": "requirement_source"
+    },
+    {
+     "key": "justification"
+    },
+    {
+     "key": "likelihood"
+    },
+    {
+     "key": "consequence"
+    }
+   ]
+  },
+  {
+   "key": "nasa_risk",
+   "name": "Risk (5x5)",
+   "icon": "alert-triangle",
+   "color": "amber",
+   "workflow": "risk",
+   "description": "A risk scored on likelihood and consequence, 1 to 5 each, with a handling approach.",
+   "fields": [
+    {
+     "key": "likelihood"
+    },
+    {
+     "key": "consequence"
+    },
+    {
+     "key": "risk_approach"
+    },
+    {
+     "key": "mitigation"
+    },
+    {
+     "key": "cost_impact"
+    },
+    {
+     "key": "schedule_impact"
+    },
+    {
+     "key": "wbs_element"
+    }
+   ]
+  },
+  {
+   "key": "nasa_product",
+   "name": "Controlled product",
+   "icon": "file-text",
+   "color": "blue",
+   "workflow": "nasa_product",
+   "description": "A plan or document that must be baselined, such as the Project Plan or SEMP.",
+   "fields": [
+    {
+     "key": "nasa_phase"
+    },
+    {
+     "key": "wbs_element"
+    },
+    {
+     "key": "reference_url"
+    },
+    {
+     "key": "justification"
+    }
+   ]
+  },
+  {
+   "key": "nasa_technology",
+   "name": "Technology development",
+   "icon": "flask",
+   "color": "teal",
+   "workflow": "simple",
+   "description": "A technology being matured, tracked by readiness level.",
+   "fields": [
+    {
+     "key": "trl"
+    },
+    {
+     "key": "wbs_element"
+    }
+   ]
+  },
+  {
+   "key": "nasa_lesson",
+   "name": "Lesson learned",
+   "icon": "lightbulb",
+   "color": "green",
+   "workflow": "simple",
+   "description": "What happened, why it matters and what to do differently.",
+   "fields": [
+    {
+     "key": "nasa_phase"
+    },
+    {
+     "key": "lesson_recommendation"
+    }
+   ]
+  }
+ ],
+ "project_templates": [
+  {
+   "key": "nasa-flight-project",
+   "name": "NASA space flight project",
+   "domain": "NASA",
+   "kind": "standard",
+   "description": "Phases Pre-Phase A to F with their life-cycle reviews and key decision points, a requirements baseline with verification, RIDs, waivers, 5x5 risks, and a project library of plan templates.",
+   "item_types": [
+    "task",
+    "milestone",
+    "action_item",
+    "decision",
+    "change_request",
+    "nasa_requirement",
+    "nasa_verification",
+    "nasa_lcr",
+    "nasa_rid",
+    "nasa_kdp",
+    "nasa_waiver",
+    "nasa_risk",
+    "nasa_product",
+    "nasa_technology",
+    "nasa_lesson"
+   ],
+   "default_type": "task",
+   "items": [
+    {
+     "type": "milestone",
+     "title": "Pre-Phase A: Concept Studies",
+     "labels": [
+      "life-cycle"
+     ],
+     "children": [
+      {
+       "type": "nasa_lcr",
+       "title": "MCR \u2014 Mission Concept Review",
+       "custom": {
+        "nasa_phase": "Pre-Phase A",
+        "review_type": "MCR"
+       },
+       "description": "Record entrance criteria, success criteria, the review board and its findings here. Link RIDs raised at the review to this item with the relation `raised_at`."
+      },
+      {
+       "type": "nasa_kdp",
+       "title": "KDP A \u2014 decision to enter Phase A",
+       "custom": {
+        "nasa_phase": "Phase A"
+       },
+       "description": "Key Decision Point A. The decision authority decides whether the project is ready to enter Phase A. Attach the decision memorandum and record the decision before closing."
+      }
+     ],
+     "description": "Life-cycle phase. The reviews and decision point beneath this item follow the generic NASA project life cycle; tailor them to the project's category and class before baselining."
+    },
+    {
+     "type": "milestone",
+     "title": "Phase A: Concept and Technology Development",
+     "labels": [
+      "life-cycle"
+     ],
+     "children": [
+      {
+       "type": "nasa_lcr",
+       "title": "SRR \u2014 System Requirements Review",
+       "custom": {
+        "nasa_phase": "Phase A",
+        "review_type": "SRR"
+       },
+       "description": "Record entrance criteria, success criteria, the review board and its findings here. Link RIDs raised at the review to this item with the relation `raised_at`."
+      },
+      {
+       "type": "nasa_lcr",
+       "title": "MDR/SDR \u2014 Mission Definition Review / System Definition Review",
+       "custom": {
+        "nasa_phase": "Phase A",
+        "review_type": "MDR"
+       },
+       "description": "Record entrance criteria, success criteria, the review board and its findings here. Link RIDs raised at the review to this item with the relation `raised_at`."
+      },
+      {
+       "type": "nasa_kdp",
+       "title": "KDP B \u2014 decision to enter Phase B",
+       "custom": {
+        "nasa_phase": "Phase B"
+       },
+       "description": "Key Decision Point B. The decision authority decides whether the project is ready to enter Phase B. Attach the decision memorandum and record the decision before closing."
+      }
+     ],
+     "description": "Life-cycle phase. The reviews and decision point beneath this item follow the generic NASA project life cycle; tailor them to the project's category and class before baselining."
+    },
+    {
+     "type": "milestone",
+     "title": "Phase B: Preliminary Design and Technology Completion",
+     "labels": [
+      "life-cycle"
+     ],
+     "children": [
+      {
+       "type": "nasa_lcr",
+       "title": "PDR \u2014 Preliminary Design Review",
+       "custom": {
+        "nasa_phase": "Phase B",
+        "review_type": "PDR"
+       },
+       "description": "Record entrance criteria, success criteria, the review board and its findings here. Link RIDs raised at the review to this item with the relation `raised_at`."
+      },
+      {
+       "type": "nasa_kdp",
+       "title": "KDP C \u2014 decision to enter Phase C",
+       "custom": {
+        "nasa_phase": "Phase C"
+       },
+       "description": "Key Decision Point C. The decision authority decides whether the project is ready to enter Phase C. Attach the decision memorandum and record the decision before closing."
+      }
+     ],
+     "description": "Life-cycle phase. The reviews and decision point beneath this item follow the generic NASA project life cycle; tailor them to the project's category and class before baselining."
+    },
+    {
+     "type": "milestone",
+     "title": "Phase C: Final Design and Fabrication",
+     "labels": [
+      "life-cycle"
+     ],
+     "children": [
+      {
+       "type": "nasa_lcr",
+       "title": "CDR \u2014 Critical Design Review",
+       "custom": {
+        "nasa_phase": "Phase C",
+        "review_type": "CDR"
+       },
+       "description": "Record entrance criteria, success criteria, the review board and its findings here. Link RIDs raised at the review to this item with the relation `raised_at`."
+      },
+      {
+       "type": "nasa_lcr",
+       "title": "PRR \u2014 Production Readiness Review",
+       "custom": {
+        "nasa_phase": "Phase C",
+        "review_type": "PRR"
+       },
+       "description": "Record entrance criteria, success criteria, the review board and its findings here. Link RIDs raised at the review to this item with the relation `raised_at`."
+      },
+      {
+       "type": "nasa_lcr",
+       "title": "SIR \u2014 System Integration Review",
+       "custom": {
+        "nasa_phase": "Phase C",
+        "review_type": "SIR"
+       },
+       "description": "Record entrance criteria, success criteria, the review board and its findings here. Link RIDs raised at the review to this item with the relation `raised_at`."
+      },
+      {
+       "type": "nasa_kdp",
+       "title": "KDP D \u2014 decision to enter Phase D",
+       "custom": {
+        "nasa_phase": "Phase D"
+       },
+       "description": "Key Decision Point D. The decision authority decides whether the project is ready to enter Phase D. Attach the decision memorandum and record the decision before closing."
+      }
+     ],
+     "description": "Life-cycle phase. The reviews and decision point beneath this item follow the generic NASA project life cycle; tailor them to the project's category and class before baselining."
+    },
+    {
+     "type": "milestone",
+     "title": "Phase D: System Assembly, Integration and Test, Launch and Checkout",
+     "labels": [
+      "life-cycle"
+     ],
+     "children": [
+      {
+       "type": "nasa_lcr",
+       "title": "TRR \u2014 Test Readiness Review",
+       "custom": {
+        "nasa_phase": "Phase D",
+        "review_type": "TRR"
+       },
+       "description": "Record entrance criteria, success criteria, the review board and its findings here. Link RIDs raised at the review to this item with the relation `raised_at`."
+      },
+      {
+       "type": "nasa_lcr",
+       "title": "SAR \u2014 System Acceptance Review",
+       "custom": {
+        "nasa_phase": "Phase D",
+        "review_type": "SAR"
+       },
+       "description": "Record entrance criteria, success criteria, the review board and its findings here. Link RIDs raised at the review to this item with the relation `raised_at`."
+      },
+      {
+       "type": "nasa_lcr",
+       "title": "ORR \u2014 Operational Readiness Review",
+       "custom": {
+        "nasa_phase": "Phase D",
+        "review_type": "ORR"
+       },
+       "description": "Record entrance criteria, success criteria, the review board and its findings here. Link RIDs raised at the review to this item with the relation `raised_at`."
+      },
+      {
+       "type": "nasa_lcr",
+       "title": "FRR/MRR \u2014 Flight Readiness Review / Mission Readiness Review",
+       "custom": {
+        "nasa_phase": "Phase D",
+        "review_type": "FRR"
+       },
+       "description": "Record entrance criteria, success criteria, the review board and its findings here. Link RIDs raised at the review to this item with the relation `raised_at`."
+      },
+      {
+       "type": "nasa_kdp",
+       "title": "KDP E \u2014 decision to enter Phase E",
+       "custom": {
+        "nasa_phase": "Phase E"
+       },
+       "description": "Key Decision Point E. The decision authority decides whether the project is ready to enter Phase E. Attach the decision memorandum and record the decision before closing."
+      }
+     ],
+     "description": "Life-cycle phase. The reviews and decision point beneath this item follow the generic NASA project life cycle; tailor them to the project's category and class before baselining."
+    },
+    {
+     "type": "milestone",
+     "title": "Phase E: Operations and Sustainment",
+     "labels": [
+      "life-cycle"
+     ],
+     "children": [
+      {
+       "type": "nasa_lcr",
+       "title": "PLAR \u2014 Post-Launch Assessment Review",
+       "custom": {
+        "nasa_phase": "Phase E",
+        "review_type": "PLAR"
+       },
+       "description": "Record entrance criteria, success criteria, the review board and its findings here. Link RIDs raised at the review to this item with the relation `raised_at`."
+      },
+      {
+       "type": "nasa_lcr",
+       "title": "CERR \u2014 Critical Events Readiness Review",
+       "custom": {
+        "nasa_phase": "Phase E",
+        "review_type": "CERR"
+       },
+       "description": "Record entrance criteria, success criteria, the review board and its findings here. Link RIDs raised at the review to this item with the relation `raised_at`."
+      },
+      {
+       "type": "nasa_lcr",
+       "title": "PFAR \u2014 Post-Flight Assessment Review",
+       "custom": {
+        "nasa_phase": "Phase E",
+        "review_type": "PFAR"
+       },
+       "description": "Record entrance criteria, success criteria, the review board and its findings here. Link RIDs raised at the review to this item with the relation `raised_at`."
+      },
+      {
+       "type": "nasa_lcr",
+       "title": "DR \u2014 Decommissioning Review",
+       "custom": {
+        "nasa_phase": "Phase E",
+        "review_type": "DR"
+       },
+       "description": "Record entrance criteria, success criteria, the review board and its findings here. Link RIDs raised at the review to this item with the relation `raised_at`."
+      },
+      {
+       "type": "nasa_kdp",
+       "title": "KDP F \u2014 decision to enter Phase F",
+       "custom": {
+        "nasa_phase": "Phase F"
+       },
+       "description": "Key Decision Point F. The decision authority decides whether the project is ready to enter Phase F. Attach the decision memorandum and record the decision before closing."
+      }
+     ],
+     "description": "Life-cycle phase. The reviews and decision point beneath this item follow the generic NASA project life cycle; tailor them to the project's category and class before baselining."
+    },
+    {
+     "type": "milestone",
+     "title": "Phase F: Closeout",
+     "labels": [
+      "life-cycle"
+     ],
+     "children": [
+      {
+       "type": "nasa_lcr",
+       "title": "DRR \u2014 Disposal Readiness Review",
+       "custom": {
+        "nasa_phase": "Phase F",
+        "review_type": "DRR"
+       },
+       "description": "Record entrance criteria, success criteria, the review board and its findings here. Link RIDs raised at the review to this item with the relation `raised_at`."
+      }
+     ],
+     "description": "Life-cycle phase. The reviews and decision point beneath this item follow the generic NASA project life cycle; tailor them to the project's category and class before baselining."
+    },
+    {
+     "type": "milestone",
+     "title": "Plans and control documents",
+     "labels": [
+      "products"
+     ],
+     "description": "A starting list of project plans. NPR 7120.5 sets which control plans are required, by phase and project category; confirm against the current revision and record tailoring in the Compliance Matrix.",
+     "children": [
+      {
+       "type": "nasa_product",
+       "title": "Project Plan",
+       "custom": {
+        "nasa_phase": "Phase A"
+       }
+      },
+      {
+       "type": "nasa_product",
+       "title": "Systems Engineering Management Plan (SEMP)",
+       "custom": {
+        "nasa_phase": "Phase A"
+       }
+      },
+      {
+       "type": "nasa_product",
+       "title": "Risk Management Plan",
+       "custom": {
+        "nasa_phase": "Phase A"
+       }
+      },
+      {
+       "type": "nasa_product",
+       "title": "Safety and Mission Assurance Plan",
+       "custom": {
+        "nasa_phase": "Phase A"
+       }
+      },
+      {
+       "type": "nasa_product",
+       "title": "Configuration Management Plan",
+       "custom": {
+        "nasa_phase": "Phase A"
+       }
+      },
+      {
+       "type": "nasa_product",
+       "title": "Verification and Validation Plan",
+       "custom": {
+        "nasa_phase": "Phase A"
+       }
+      },
+      {
+       "type": "nasa_product",
+       "title": "Review Plan",
+       "custom": {
+        "nasa_phase": "Phase A"
+       }
+      },
+      {
+       "type": "nasa_product",
+       "title": "Software Management Plan",
+       "custom": {
+        "nasa_phase": "Phase A"
+       }
+      },
+      {
+       "type": "nasa_product",
+       "title": "Acquisition Plan",
+       "custom": {
+        "nasa_phase": "Phase A"
+       }
+      },
+      {
+       "type": "nasa_product",
+       "title": "Technology Development Plan",
+       "custom": {
+        "nasa_phase": "Phase A"
+       }
+      },
+      {
+       "type": "nasa_product",
+       "title": "Mission Operations Plan",
+       "custom": {
+        "nasa_phase": "Phase A"
+       }
+      }
+     ]
+    }
+   ],
+   "space": {
+    "name": "Project library",
+    "kind": "wiki",
+    "pages": [
+     {
+      "title": "How this project is organized",
+      "template": "nasa-guide",
+      "children": [
+       {
+        "title": "Compliance and tailoring matrix",
+        "template": "nasa-compliance-matrix"
+       },
+       {
+        "title": "Common technical processes",
+        "template": "nasa-technical-processes"
+       }
+      ]
+     },
+     {
+      "title": "Project Plan",
+      "template": "nasa-project-plan"
+     },
+     {
+      "title": "Systems Engineering Management Plan",
+      "template": "nasa-semp"
+     },
+     {
+      "title": "Concept of Operations",
+      "template": "nasa-conops"
+     },
+     {
+      "title": "Risk Management Plan",
+      "template": "nasa-risk-plan"
+     },
+     {
+      "title": "Verification and Validation Plan",
+      "template": "nasa-vv-plan"
+     },
+     {
+      "title": "Reviews",
+      "body": "One page per review. Start each from the **Life-cycle review package** template.\n",
+      "children": []
+     }
+    ]
+   }
+  }
+ ],
+ "page_templates": [
+  {
+   "key": "nasa-guide",
+   "name": "NASA project guide",
+   "category": "NASA",
+   "description": "How the project template maps to NPR 7120.5 and NPR 7123.1.",
+   "file": "templates/guide.md"
+  },
+  {
+   "key": "nasa-compliance-matrix",
+   "name": "Compliance and tailoring matrix",
+   "category": "NASA",
+   "description": "Requirement-by-requirement record of compliance and approved tailoring.",
+   "file": "templates/compliance-matrix.md"
+  },
+  {
+   "key": "nasa-technical-processes",
+   "name": "Common technical processes",
+   "category": "NASA",
+   "description": "The 17 processes of the systems engineering engine and where each is done here.",
+   "file": "templates/technical-processes.md"
+  },
+  {
+   "key": "nasa-project-plan",
+   "name": "Project Plan",
+   "category": "NASA",
+   "description": "Outline for the Project Plan.",
+   "file": "templates/project-plan.md"
+  },
+  {
+   "key": "nasa-semp",
+   "name": "Systems Engineering Management Plan",
+   "category": "NASA",
+   "description": "Outline for the SEMP.",
+   "file": "templates/semp.md"
+  },
+  {
+   "key": "nasa-conops",
+   "name": "Concept of Operations",
+   "category": "NASA",
+   "description": "Outline for the ConOps.",
+   "file": "templates/conops.md"
+  },
+  {
+   "key": "nasa-risk-plan",
+   "name": "Risk Management Plan",
+   "category": "NASA",
+   "description": "Outline for the Risk Management Plan with the 5x5 scoring scales.",
+   "file": "templates/risk-plan.md"
+  },
+  {
+   "key": "nasa-vv-plan",
+   "name": "Verification and Validation Plan",
+   "category": "NASA",
+   "description": "Outline for the V&V Plan and verification matrix.",
+   "file": "templates/vv-plan.md"
+  },
+  {
+   "key": "nasa-review-package",
+   "name": "Life-cycle review package",
+   "category": "NASA",
+   "description": "Entrance criteria, success criteria, board and findings for one review.",
+   "file": "templates/review-package.md"
+  },
+  {
+   "key": "nasa-lessons",
+   "name": "Lessons learned entry",
+   "category": "NASA",
+   "description": "Driving event, lesson and recommendation.",
+   "file": "templates/lessons-learned.md"
+  }
+ ]
+}

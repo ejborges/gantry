@@ -1,0 +1,26 @@
+# Development configuration. Never use this file in production: the key below is public.
+[server]
+bind = "127.0.0.1:8600"
+public_url = ""
+web_root = "web/dist"
+manual_root = "docs/manual/_site"
+
+[database]
+url = "postgres://postgres@127.0.0.1:5433/gantry_dev"
+
+[security]
+secret_key = "Z2FudHJ5LWRldi1rZXktbmV2ZXItaW4tcHJvZCEhISE="
+allow_insecure_outbound = true
+
+[logging]
+format = "text"
+level = "info"
+
+[storage.blob]
+path = "target/dev-blobs"
+
+[ai.embeddings]
+provider = "hash"
+
+[addons]
+dir = "addons"

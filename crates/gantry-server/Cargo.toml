@@ -1,0 +1,66 @@
+[package]
+name = "gantry-server"
+description = "Gantry server: API, worker, MCP endpoint and administration CLI"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "gantry"
+path = "src/main.rs"
+
+[lib]
+name = "gantry"
+path = "src/lib.rs"
+
+[dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "signal", "time", "sync", "fs", "io-util", "io-std"] }
+axum = { version = "0.8", default-features = false, features = ["json", "query", "form", "tokio", "http1", "http2", "ws"] }
+tower = { version = "0.5", features = ["util"] }
+tower-http = { version = "0.6", features = ["fs", "compression-gzip", "limit", "catch-panic"] }
+sqlx = { version = "0.8", default-features = false, features = ["postgres", "runtime-tokio", "tls-rustls-ring-webpki", "uuid", "chrono", "json", "migrate", "macros"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", default-features = false, features = ["clock", "serde", "std"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
+argon2 = "0.5"
+rand = "0.8"
+sha2 = "0.10"
+hmac = "0.12"
+base64 = "0.22"
+hex = "0.4"
+subtle = "2"
+aes-gcm = "0.10"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+jsonwebtoken = "9"
+clap = { version = "4", features = ["derive", "env"] }
+toml = "0.8"
+thiserror = "2"
+anyhow = "1"
+async-trait = "0.1"
+regex = "1"
+url = "2"
+bytes = "1"
+http-body-util = "0.1"
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+# Email (SMTP over rustls; trusts the system certificate store so private CAs work).
+lettre = { version = "0.11", default-features = false, features = ["builder", "smtp-transport", "tokio1-rustls", "ring", "rustls-native-certs", "hostname"] }
+# SAML: XML parsing, DEFLATE for the redirect binding, certificate and signature handling.
+roxmltree = "0.20"
+flate2 = "1"
+rsa = { version = "0.9", features = ["sha2", "pem"] }
+x509-cert = { version = "0.2", default-features = false, features = ["pem", "std"] }
+# Avatar validation without decoding whole images.
+imagesize = "0.13"
+chrono-tz = "0.10"
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[dev-dependencies]
+tokio-tungstenite = { version = "0.28", default-features = false, features = ["connect", "handshake"] }
+serde_urlencoded = "0.7"
+axum = { version = "0.8", default-features = false, features = ["form"] }

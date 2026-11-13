@@ -1,0 +1,81 @@
+#!/usr/bin/bash
+# Writes the nginx site for Gantry from the template that ships with the package.
+#
+#   nginx-site render HOST CERT KEY   write /etc/nginx/conf.d/gantry.conf (used by gantry-setup)
+#   nginx-site refresh                rewrite it from the current template, keeping the host
+#                                     name, certificate and upload limit it has now; test the
+#                                     result and reload nginx (run after every package upgrade)
+#
+# A site whose first line is no longer "# Managed by gantry-setup" has been taken over by
+# the administrator and is never changed. `refresh` then only says what it would have added.
+set -euo pipefail
+
+SITE="${GANTRY_NGINX_SITE:-/etc/nginx/conf.d/gantry.conf}"
+TEMPLATE="${GANTRY_NGINX_TEMPLATE:-/usr/share/gantry/nginx/gantry.conf.in}"
+NGINX="${GANTRY_NGINX_BIN:-nginx}"
+note() { printf '    %s\n' "$*"; }
+managed() { [ -e "$SITE" ] && head -1 "$SITE" | grep -q '^# Managed by gantry-setup'; }
+
+render() { # HOST CERT KEY [BODY_LIMIT] -> stdout
+  local host="$1" cert="$2" key="$3" body="${4:-}" h2_listen h2_on drop_v6 version
+  case "$host" in *[!A-Za-z0-9.-]*|"") echo "nginx-site: '$host' is not a usable host name" >&2; return 1 ;; esac
+  case "$cert$key" in *[\|\&\;\ ]*|"") echo "nginx-site: certificate paths must not contain spaces or | & ;" >&2; return 1 ;; esac
+  # "http2 on;" exists from nginx 1.25.1; older releases take it on the listen line.
+  version="$("$NGINX" -v 2>&1 | sed -n 's|.*nginx/\([0-9.]*\).*|\1|p')"
+  if [ "$(printf '%s\n1.25.1\n' "${version:-0}" | sort -V | head -1)" = 1.25.1 ]; then h2_listen="" h2_on="    http2 on;\\n"; else h2_listen=" http2" h2_on=""; fi
+  # nginx refuses to start with an IPv6 listener on a machine where IPv6 is switched off.
+  if [ -e /proc/net/if_inet6 ]; then drop_v6='/^$/b'; else drop_v6='/listen \[::\]/d'; fi
+  sed -e "s|@HOSTNAME@|$host|g" -e "s|@CERT@|$cert|g" -e "s|@KEY@|$key|g" -e "s|@HTTP2_LISTEN@|$h2_listen|g" -e "s|^@HTTP2_ON@|$h2_on|" -e "$drop_v6" "$TEMPLATE" |
+    if [ -n "$body" ]; then sed -e "s|^\(\s*client_max_body_size\s\+\)[0-9]\+[kKmMgG]\?;|\1$body;|"; else cat; fi
+}
+
+case "${1:-}" in
+  render)
+    [ $# -eq 4 ] || { echo "usage: nginx-site render HOST CERT KEY" >&2; exit 2; }
+    if [ ! -e "$SITE" ] || managed; then
+      render "$2" "$3" "$4" > "$SITE.new"
+      mv -f "$SITE.new" "$SITE"
+      note "wrote $SITE"
+    else
+      note "$SITE has been edited by hand; left unchanged"
+    fi
+    ;;
+  refresh)
+    [ -e "$SITE" ] || exit 0          # nginx is not configured here (--no-nginx)
+    [ -r "$TEMPLATE" ] || exit 0
+    if ! managed; then
+      grep -q 'location = /api/v1/ws' "$SITE" || {
+        echo "gantry: $SITE is maintained by hand and has no WebSocket location for /api/v1/ws."
+        echo "        Live updates need it. Compare your file with $TEMPLATE"
+        echo "        (see \"What the web server must pass through\" in the system administrator guide)."
+      }
+      exit 0
+    fi
+    host="$(sed -n 's/^\s*server_name\s\+\([^; ]\+\).*/\1/p' "$SITE" | head -1)"
+    cert="$(sed -n 's/^\s*ssl_certificate\s\+\([^; ]\+\);.*/\1/p' "$SITE" | head -1)"
+    key="$(sed -n 's/^\s*ssl_certificate_key\s\+\([^; ]\+\);.*/\1/p' "$SITE" | head -1)"
+    body="$(sed -n 's/^\s*client_max_body_size\s\+\([0-9]\+[kKmMgG]\?\);.*/\1/p' "$SITE" | head -1)"
+    if [ -z "$host" ] || [ -z "$cert" ] || [ -z "$key" ]; then
+      echo "gantry: could not read the host name and certificate from $SITE; left unchanged. Run gantry-setup to rewrite it."
+      exit 0
+    fi
+    render "$host" "$cert" "$key" "$body" > "$SITE.new" || { rm -f "$SITE.new"; exit 0; }
+    if cmp -s "$SITE.new" "$SITE"; then rm -f "$SITE.new"; exit 0; fi
+    cp -pf "$SITE" "$SITE.before-upgrade"
+    mv -f "$SITE.new" "$SITE"
+    if command -v restorecon >/dev/null 2>&1; then restorecon "$SITE" 2>/dev/null || true; fi
+    if "$NGINX" -t >/dev/null 2>&1; then
+      rm -f "$SITE.before-upgrade"
+      if [ -z "${GANTRY_NGINX_NO_RELOAD:-}" ] && systemctl is-active --quiet nginx.service 2>/dev/null; then systemctl reload nginx.service || true; fi
+      echo "gantry: updated $SITE for this version (live updates over WebSocket, a page for when the application is unavailable)."
+    else
+      mv -f "$SITE.before-upgrade" "$SITE"
+      echo "gantry: nginx did not accept the updated site, so $SITE was left as it was."
+      echo "        Live updates need a WebSocket location for /api/v1/ws; compare with $TEMPLATE."
+    fi
+    ;;
+  *)
+    sed -n '2,/^set -euo/p' "$0" | sed -e '$d' -e 's/^# \{0,1\}//'
+    exit 2
+    ;;
+esac

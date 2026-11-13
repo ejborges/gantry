@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Custom content</title>
+<style>
+  :root { color-scheme: light; --text: #1b1f24; --muted: #5c6670; --grid: #dfe3e8; --background: #ffffff; --accent: #1f5fbf; --danger: #b42318; }
+  html, body { margin: 0; height: 100%; }
+  body { font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--text); background: transparent; overflow: hidden; }
+  #root { width: 100%; height: 100%; box-sizing: border-box; position: relative; }
+  html.flow, html.flow body, html.flow #root { height: auto; overflow: visible; }
+  a { color: var(--accent); }
+  .gantry-note { margin: 8px; padding: 10px 12px; border: 1px solid var(--grid); border-left: 3px solid var(--danger); border-radius: 6px; font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .gantry-note b { display: block; margin-bottom: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+/* The runtime for custom content. This page has no access to the application: it runs
+   with an opaque origin, may open no network connection, and learns everything it shows by
+   asking the page around it, which answers with what the viewer is allowed to read. */
+(function () {
+  'use strict';
+  /* Peer connections are a way out to the network that the content policy of today's
+     browsers does not yet govern, so they are taken away before any content runs. This is
+     a second line of defense, not the only one: see the security chapter of the manual. */
+  ['RTCPeerConnection', 'webkitRTCPeerConnection', 'mozRTCPeerConnection', 'RTCDataChannel', 'RTCSessionDescription', 'RTCIceCandidate'].forEach(function (name) {
+    try { Object.defineProperty(window, name, { value: undefined, writable: false, configurable: false }); } catch (e) { /* not present in this browser */ }
+  });
+  var host = window.parent;
+  var root = document.getElementById('root');
+  var AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+  var pending = new Map();
+  var seq = 0;
+  var cleanups = [];
+  var resizers = [];
+  var generation = 0;
+  var last = null;
+  var loaded = {};
+  var locale = 'en-US';
+  var zone;
+
+  function send(msg) {
+    msg.source = 'gantry-sandbox';
+    host.postMessage(msg, '*');
+  }
+
+  var gantry = {
+    root: root,
+    params: {},
+    theme: 'light',
+    colors: {},
+    size: { width: 0, height: 0 },
+    api: {
+      /* Read-only. `path` starts with /api/v1/; `query` is an object of simple values. */
+      get: function (path, query) {
+        return new Promise(function (resolve, reject) {
+          var id = ++seq;
+          pending.set(id, { resolve: resolve, reject: reject });
+          send({ type: 'api', id: id, path: String(path), query: query || null });
+        });
+      },
+    },
+    /* Dates in the viewer's own time zone. A plain date (2026-03-31) stays that date. */
+    formatDate: function (value, options) {
+      try {
+        var plain = typeof value === 'string' && value.length === 10;
+        var opts = Object.assign({}, options || { dateStyle: 'medium' }, { timeZone: plain ? 'UTC' : zone });
+        return new Intl.DateTimeFormat(locale, opts).format(new Date(plain ? value + 'T12:00:00Z' : value));
+      } catch (e) {
+        return String(value);
+      }
+    },
+    formatNumber: function (value, options) {
+      try { return new Intl.NumberFormat(locale, options).format(value); } catch (e) { return String(value); }
+    },
+    /* Called before the script runs again or the tile goes away: destroy charts here. */
+    cleanup: function (fn) { cleanups.push(fn); },
+    onResize: function (fn) { resizers.push(fn); },
+    ready: function () {},
+  };
+  window.gantry = gantry;
+
+  function teardown() {
+    cleanups.splice(0).forEach(function (fn) { try { fn(); } catch (e) { /* a failing cleanup must not block the next run */ } });
+    resizers.length = 0;
+  }
+
+  function fail(error) {
+    var message = error && error.message ? error.message : String(error);
+    var box = document.createElement('div');
+    box.className = 'gantry-note';
+    box.setAttribute('role', 'alert');
+    box.appendChild(document.createElement('b')).textContent = 'This content could not be shown';
+    box.appendChild(document.createTextNode(message));
+    root.textContent = '';
+    root.appendChild(box);
+    send({ type: 'error', message: message.slice(0, 500) });
+    reportHeight();
+  }
+
+  function applyTheme(theme, colors) {
+    gantry.theme = theme === 'dark' ? 'dark' : 'light';
+    gantry.colors = colors || {};
+    var style = document.documentElement.style;
+    style.setProperty('color-scheme', gantry.theme);
+    ['text', 'muted', 'grid', 'background', 'accent', 'danger'].forEach(function (k) {
+      if (typeof gantry.colors[k] === 'string') style.setProperty('--' + k, gantry.colors[k]);
+    });
+  }
+
+  function measure() {
+    gantry.size = { width: Math.max(1, root.clientWidth), height: Math.max(1, root.clientHeight) };
+  }
+
+  function reportHeight() {
+    if (document.documentElement.classList.contains('flow')) {
+      send({ type: 'height', height: Math.ceil(document.documentElement.scrollHeight) });
+    }
+  }
+
+  function loadScript(src) {
+    if (loaded[src]) return loaded[src];
+    loaded[src] = new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = function () { resolve(); };
+      s.onerror = function () { delete loaded[src]; reject(new Error('The chart library could not be loaded.')); };
+      document.head.appendChild(s);
+    });
+    return loaded[src];
+  }
+
+  function runScript(source) {
+    return new AsyncFunction('gantry', 'root', source)(gantry, root);
+  }
+
+  /* HTML content: markup is inserted as written; each <script> runs in order, as the body
+     of an async function with `gantry` in scope. */
+  function runHtml(source) {
+    var template = document.createElement('template');
+    template.innerHTML = source;
+    var scripts = Array.prototype.slice.call(template.content.querySelectorAll('script'));
+    scripts.forEach(function (s) { s.remove(); });
+    root.appendChild(template.content);
+    return scripts.reduce(function (chain, s) {
+      return chain.then(function () { return s.src ? undefined : runScript(s.textContent || ''); });
+    }, Promise.resolve());
+  }
+
+  function start(m) {
+    last = m;
+    var mine = ++generation;
+    teardown();
+    root.textContent = '';
+    document.documentElement.classList.toggle('flow', m.mode === 'flow');
+    gantry.params = m.params || {};
+    locale = m.locale || 'en-US';
+    zone = m.timeZone || undefined;
+    applyTheme(m.theme, m.colors);
+    measure();
+    (m.scripts || []).reduce(function (chain, src) { return chain.then(function () { return loadScript(src); }); }, Promise.resolve())
+      .then(function () {
+        if (mine !== generation) return;
+        return m.kind === 'html' ? runHtml(m.source || '') : runScript(m.source || '');
+      })
+      .then(function () {
+        if (mine !== generation) return;
+        send({ type: 'rendered' });
+        reportHeight();
+      })
+      .catch(function (e) { if (mine === generation) fail(e); });
+  }
+
+  window.addEventListener('message', function (ev) {
+    if (ev.source !== host || !ev.data || typeof ev.data !== 'object') return;
+    var m = ev.data;
+    if (m.type === 'api-result') {
+      var p = pending.get(m.id);
+      if (!p) return;
+      pending.delete(m.id);
+      if (m.ok) p.resolve(m.data); else p.reject(new Error(m.error || 'The request failed.'));
+    } else if (m.type === 'run') {
+      start(m);
+    } else if (m.type === 'refresh' && last) {
+      start(last);
+    } else if (m.type === 'theme' && last) {
+      last.theme = m.theme;
+      last.colors = m.colors;
+      start(last);
+    }
+  });
+
+  window.addEventListener('error', function (ev) { fail(ev.error || ev.message); });
+  window.addEventListener('unhandledrejection', function (ev) { fail(ev.reason); });
+
+  if (window.ResizeObserver) {
+    var timer;
+    new ResizeObserver(function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        measure();
+        resizers.forEach(function (fn) { try { fn(gantry.size); } catch (e) { /* ignore */ } });
+        reportHeight();
+      }, 80);
+    }).observe(root);
+  }
+
+  send({ type: 'ready' });
+})();
+</script>
+</body>
+</html>

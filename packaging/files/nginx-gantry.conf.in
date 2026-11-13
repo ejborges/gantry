@@ -1,0 +1,75 @@
+# Managed by gantry-setup. Delete this first line to keep your own changes: setup will then leave the file alone.
+upstream gantry_app {
+    server 127.0.0.1:8600;
+    keepalive 32;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name @HOSTNAME@;
+    location / {
+        return 308 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl@HTTP2_LISTEN@;
+    listen [::]:443 ssl@HTTP2_LISTEN@;
+@HTTP2_ON@    server_name @HOSTNAME@;
+
+    ssl_certificate     @CERT@;
+    ssl_certificate_key @KEY@;
+    # Protocols and ciphers follow the system crypto policy (update-crypto-policies).
+    ssl_session_cache   shared:gantry:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+    # Gantry itself sends Strict-Transport-Security and the other security headers.
+
+    # One megabyte above server.max_body_mb so the application, not nginx, explains the limit.
+    client_max_body_size 26m;
+
+    access_log /var/log/nginx/gantry.access.log;
+    error_log  /var/log/nginx/gantry.error.log warn;
+
+    proxy_http_version 1.1;
+    proxy_set_header Connection        "";
+    proxy_set_header Host              $host;
+    proxy_set_header X-Real-IP         $remote_addr;
+    proxy_set_header X-Forwarded-For   $remote_addr;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_connect_timeout 5s;
+    proxy_read_timeout    120s;
+    proxy_request_buffering off;
+
+    # Metrics are for the monitoring system, which reads them on the loopback address.
+    location = /metrics {
+        return 404;
+    }
+
+    # Live updates and shared editing use one long-lived WebSocket per browser tab.
+    location = /api/v1/ws {
+        proxy_pass http://gantry_app;
+        proxy_set_header Upgrade           $http_upgrade;
+        proxy_set_header Connection        "upgrade";
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 1h;
+        proxy_send_timeout 1h;
+    }
+
+    # While the application is stopped or restarting, people see a page that says so and
+    # tries again by itself. To add your own support contact to it, copy the file elsewhere,
+    # edit it, point "root" below at your copy, and delete the first line of this file.
+    error_page 502 503 504 /unavailable.html;
+    location = /unavailable.html {
+        root /usr/share/gantry/web;
+        internal;
+    }
+
+    location / {
+        proxy_pass http://gantry_app;
+    }
+}

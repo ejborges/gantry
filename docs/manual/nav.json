@@ -1,0 +1,91 @@
+[
+  {
+    "pages": [
+      "index.md"
+    ]
+  },
+  {
+    "title": "Using Gantry",
+    "pages": [
+      "user/index.md",
+      "user/signing-in.md",
+      "user/my-work.md",
+      "user/notifications.md",
+      "user/projects.md",
+      "user/work-items.md",
+      "user/writing.md",
+      "user/together.md",
+      "user/service-desk.md",
+      "user/docs.md",
+      "user/planning.md",
+      "user/gantt.md",
+      "user/workflows.md",
+      "user/analytics.md",
+      "user/search.md",
+      "user/people.md",
+      "user/profile.md",
+      "user/agents.md",
+      "user/accessibility.md",
+      "user/about.md",
+      "user/troubleshooting.md"
+    ]
+  },
+  {
+    "title": "Application administration",
+    "pages": [
+      "admin/index.md",
+      "admin/users.md",
+      "admin/agents.md",
+      "admin/sign-in.md",
+      "admin/site.md",
+      "admin/notifications.md",
+      "admin/schemes.md",
+      "admin/projects.md",
+      "admin/service-desk.md",
+      "admin/integrations.md",
+      "admin/addons.md",
+      "admin/audit.md",
+      "admin/troubleshooting.md"
+    ]
+  },
+  {
+    "title": "System administration",
+    "pages": [
+      "sysadmin/index.md",
+      "sysadmin/install.md",
+      "sysadmin/configuration.md",
+      "sysadmin/email.md",
+      "sysadmin/operations.md",
+      "sysadmin/alerts.md",
+      "sysadmin/logs.md",
+      "sysadmin/security.md",
+      "sysadmin/backup.md",
+      "sysadmin/upgrade.md",
+      "sysadmin/scaling.md",
+      "sysadmin/storage.md",
+      "sysadmin/troubleshooting.md"
+    ]
+  },
+  {
+    "title": "Reference",
+    "pages": [
+      "reference/api.md",
+      "reference/mcp.md",
+      "reference/permissions.md",
+      "reference/markdown.md",
+      "reference/visualizations.md",
+      "reference/configuration.md",
+      "reference/cli.md",
+      "reference/events.md",
+      "reference/catalog.md",
+      "reference/packs.md"
+    ]
+  },
+  {
+    "title": "NASA add-on",
+    "pages": [
+      "nasa/index.md",
+      "nasa/working.md"
+    ]
+  }
+]

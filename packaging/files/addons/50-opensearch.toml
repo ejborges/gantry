@@ -1,0 +1,9 @@
+# Installed by gantry-addon-opensearch. Full-text search is served by the OpenSearch
+# container on this machine (gantry-opensearch.service). After switching backends run:
+#   runuser -u gantry -- gantry reindex
+# For a shared or remote cluster set url, username and password here instead and
+# disable the local container: systemctl disable --now gantry-opensearch.service
+[storage.search]
+backend = "opensearch"
+url = "http://127.0.0.1:9200"
+index = "gantry"

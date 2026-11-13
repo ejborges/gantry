@@ -1,0 +1,23 @@
+#!/usr/bin/bash
+# Called by add-on package scriptlets. Applies an add-on immediately when Gantry is
+# already set up and running, and stays quiet otherwise: gantry-setup, or the next
+# start of gantry.service (which runs "gantry migrate"), picks the add-on up then.
+#
+#   addon-apply pack ID     load a content pack into the database (no restart needed)
+#   addon-apply restart     restart the services so a storage back end change takes effect
+set -u
+[ -s /etc/gantry/secret.key ] || exit 0
+systemctl is-active --quiet gantry.service || exit 0
+case "${1:-}" in
+  pack)
+    runuser -u gantry -- /usr/bin/gantry pack install "${2:?pack id}" \
+      || echo "gantry: add-on $2 will be loaded when gantry.service next starts" >&2
+    ;;
+  restart)
+    systemctl daemon-reload
+    systemctl try-restart gantry.service gantry-worker.service \
+      || echo "gantry: restart gantry.service to apply the change" >&2
+    ;;
+  *) echo "usage: addon-apply pack ID | restart" >&2; exit 2 ;;
+esac
+exit 0

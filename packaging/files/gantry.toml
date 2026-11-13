@@ -1,0 +1,108 @@
+# Gantry configuration. Every key is optional; the values shown are the defaults.
+# Files in /etc/gantry/conf.d/*.toml are applied on top of this one in name order
+# (optional packages put theirs there). Check the result with:  gantry config check
+# Full reference: /manual/reference/configuration.html
+
+[server]
+# Keep the application on loopback; nginx terminates TLS in front of it.
+bind = "127.0.0.1:8600"
+# The address people type. Must be https in production: it turns on Secure cookies
+# and is used in links, sign-in redirects and webhook addresses.
+public_url = ""
+# Proxies allowed to state the client address (X-Real-IP / X-Forwarded-For).
+trusted_proxies = ["127.0.0.1", "::1"]
+max_body_mb = 25
+rate_limit_per_minute = 600
+# Bearer token for /metrics. Empty: only loopback clients may read metrics.
+metrics_token = ""
+
+[database]
+# Local PostgreSQL over its socket, authenticated as the "gantry" system account.
+url = "postgres://gantry@%2Fvar%2Frun%2Fpostgresql/gantry"
+max_connections = 20
+
+[security]
+# 32 random bytes, base64. Encrypts stored secrets (single sign-on client secrets,
+# integration tokens). Created by gantry-setup. Back it up: without it those secrets
+# cannot be read. Never commit it or paste it into a ticket.
+secret_key_file = "/etc/gantry/secret.key"
+# Refuse outbound integration calls to private network addresses.
+block_private_networks = true
+allow_insecure_outbound = false
+
+[auth]
+# Turn off once single sign-on works and a break-glass administrator is recorded.
+allow_local_login = true
+password_min_length = 12
+session_idle_minutes = 480
+session_absolute_hours = 168
+# Lock an account for lockout_minutes after this many wrong passwords in a row.
+lockout_threshold = 10
+lockout_minutes = 15
+# Failed sign-ins allowed from one address in five minutes.
+login_attempts_per_ip = 30
+
+[logging]
+# json goes to the journal one object per line; text is for reading at a terminal.
+format = "json"
+level = "info"
+
+[storage.blob]
+# "fs" keeps attachments under `path`; "s3" uses any S3-compatible store.
+backend = "fs"
+path = "/var/lib/gantry/blobs"
+
+[storage.search]
+# "pg" (PostgreSQL full text) or "opensearch".
+backend = "pg"
+
+[storage.vector]
+# "pg_array" (exact, no extension needed) or "pgvector" (HNSW index).
+backend = "pg_array"
+
+[storage.kv]
+# "pg" or "valkey" (sessions stay in PostgreSQL; this holds counters and short-lived state).
+backend = "pg"
+
+[ai.embeddings]
+# Semantic search. "none", "hash" (built in, offline, modest quality) or
+# "openai_compatible" (any server with POST {base_url}/embeddings).
+provider = "hash"
+dimensions = 256
+
+[worker]
+# Background jobs run inside the server. Set false on nodes that only serve requests
+# and run gantry-worker.service on the nodes that should do the work.
+embedded = true
+concurrency = 4
+
+[email]
+# Notification email. Off until enabled; also needs host and from here, and
+# server.public_url above (messages link back to the site). Check with:  gantry doctor
+enabled = false
+host = ""
+port = 587
+# "starttls" (usual on 587), "tls" (implicit TLS, usual on 465) or "none" (a relay on
+# this machine or a trusted network only).
+encryption = "starttls"
+username = ""
+# Keep the password out of this file: put it in a file only root and gantry can read
+# (chown root:gantry, chmod 640) and name the file here.
+password_file = ""
+# For example: "Gantry <gantry@example.org>"
+from = ""
+# Where replies should go, for example the service desk mailbox. Empty: no Reply-To.
+reply_to = ""
+timeout_seconds = 20
+
+[realtime]
+# Live updates and editing at the same time, over a WebSocket at /api/v1/ws.
+# nginx must pass that address through (the site written by gantry-setup does).
+enabled = true
+# Connections one account may hold at once (browser tabs and devices).
+max_connections_per_user = 12
+# Messages a connection may send per second before it is closed.
+max_messages_per_second = 60
+
+[addons]
+dir = "/usr/share/gantry/addons"

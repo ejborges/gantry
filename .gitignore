@@ -1,0 +1,16 @@
+/target/
+/build/
+/dist/
+/vendor/
+/.vagrant/
+/web/node_modules/
+/web/dist/
+/web/test-results/
+/web/playwright-report/
+/docs/manual/_site/
+*.rpm
+.DS_Store
+/web/public/vendor/
+/web/public/licenses.json
+/web/public/build.json
+Cargo.lock

@@ -1,0 +1,5196 @@
+{
+  "alert_kinds": [
+    {
+      "description": "Share of requests that ended in a server error (5xx) over a period.",
+      "kind": "http_error_rate",
+      "name": "Server error rate",
+      "params": [
+        {
+          "default": 10,
+          "key": "window_minutes",
+          "label": "Period in minutes"
+        },
+        {
+          "default": 5,
+          "key": "threshold_percent",
+          "label": "Alert above this percentage"
+        },
+        {
+          "default": 50,
+          "key": "min_requests",
+          "label": "Ignore periods with fewer requests than"
+        }
+      ],
+      "scope": "system"
+    },
+    {
+      "description": "Average time to answer a request over a period.",
+      "kind": "http_latency",
+      "name": "Response time",
+      "params": [
+        {
+          "default": 10,
+          "key": "window_minutes",
+          "label": "Period in minutes"
+        },
+        {
+          "default": 1500,
+          "key": "threshold_ms",
+          "label": "Alert above this many milliseconds"
+        },
+        {
+          "default": 50,
+          "key": "min_requests",
+          "label": "Ignore periods with fewer requests than"
+        }
+      ],
+      "scope": "system"
+    },
+    {
+      "description": "Requests answered 429 over a period: a client in a loop, or an attack.",
+      "kind": "rate_limited",
+      "name": "Requests refused by the rate limit",
+      "params": [
+        {
+          "default": 10,
+          "key": "window_minutes",
+          "label": "Period in minutes"
+        },
+        {
+          "default": 200,
+          "key": "threshold",
+          "label": "Alert above this many"
+        }
+      ],
+      "scope": "system"
+    },
+    {
+      "description": "Jobs waiting to run right now.",
+      "kind": "job_backlog",
+      "name": "Background job backlog",
+      "params": [
+        {
+          "default": 500,
+          "key": "threshold",
+          "label": "Alert above this many waiting jobs"
+        }
+      ],
+      "scope": "system"
+    },
+    {
+      "description": "Jobs that failed for good over a period.",
+      "kind": "job_failures",
+      "name": "Background job failures",
+      "params": [
+        {
+          "default": 60,
+          "key": "window_minutes",
+          "label": "Period in minutes"
+        },
+        {
+          "default": 5,
+          "key": "threshold",
+          "label": "Alert at this many failures"
+        }
+      ],
+      "scope": "system"
+    },
+    {
+      "description": "Highest share of the connection pool in use on any node in the last few minutes.",
+      "kind": "db_pool",
+      "name": "Database connections in use",
+      "params": [
+        {
+          "default": 90,
+          "key": "threshold_percent",
+          "label": "Alert above this percentage"
+        }
+      ],
+      "scope": "system"
+    },
+    {
+      "description": "File storage, search or cache does not answer its health check.",
+      "kind": "component_down",
+      "name": "Component health",
+      "params": [],
+      "scope": "system"
+    },
+    {
+      "description": "A node that was running in the last day has not reported for a while.",
+      "kind": "node_missing",
+      "name": "Server node stopped reporting",
+      "params": [
+        {
+          "default": 5,
+          "key": "minutes",
+          "label": "Minutes without a report"
+        }
+      ],
+      "scope": "system"
+    },
+    {
+      "description": "Audit entries that could not be stored over a period.",
+      "kind": "audit_failures",
+      "name": "Audit log write failures",
+      "params": [
+        {
+          "default": 10,
+          "key": "window_minutes",
+          "label": "Period in minutes"
+        },
+        {
+          "default": 1,
+          "key": "threshold",
+          "label": "Alert at this many"
+        }
+      ],
+      "scope": "system"
+    },
+    {
+      "description": "Security events over a period, optionally only some kinds or one severity.",
+      "kind": "security_events",
+      "name": "Security events",
+      "params": [
+        {
+          "default": 15,
+          "key": "window_minutes",
+          "label": "Period in minutes"
+        },
+        {
+          "default": 20,
+          "key": "threshold",
+          "label": "Alert at this many events"
+        }
+      ],
+      "scope": "system"
+    },
+    {
+      "description": "Messages the mail server refused over a period.",
+      "kind": "email_failures",
+      "name": "Email delivery failures",
+      "params": [
+        {
+          "default": 60,
+          "key": "window_minutes",
+          "label": "Period in minutes"
+        },
+        {
+          "default": 5,
+          "key": "threshold",
+          "label": "Alert at this many"
+        }
+      ],
+      "scope": "system"
+    },
+    {
+      "description": "Messages to Slack, Teams or webhooks that failed over a period.",
+      "kind": "integration_failures",
+      "name": "Integration delivery failures",
+      "params": [
+        {
+          "default": 60,
+          "key": "window_minutes",
+          "label": "Period in minutes"
+        },
+        {
+          "default": 5,
+          "key": "threshold",
+          "label": "Alert at this many"
+        }
+      ],
+      "scope": "application"
+    },
+    {
+      "description": "Requests that missed a response or resolution target over a period.",
+      "kind": "sla_breaches",
+      "name": "Missed service-level targets",
+      "params": [
+        {
+          "default": 60,
+          "key": "window_minutes",
+          "label": "Period in minutes"
+        },
+        {
+          "default": 3,
+          "key": "threshold",
+          "label": "Alert at this many"
+        }
+      ],
+      "scope": "application"
+    },
+    {
+      "description": "Open service desk requests nobody has taken, older than a given age.",
+      "kind": "unassigned_requests",
+      "name": "Unassigned requests",
+      "params": [
+        {
+          "default": 240,
+          "key": "older_than_minutes",
+          "label": "Older than this many minutes"
+        },
+        {
+          "default": 1,
+          "key": "threshold",
+          "label": "Alert at this many"
+        }
+      ],
+      "scope": "application"
+    },
+    {
+      "description": "Open work items past their due date, in one project or everywhere.",
+      "kind": "overdue_items",
+      "name": "Overdue work",
+      "params": [
+        {
+          "default": 10,
+          "key": "threshold",
+          "label": "Alert at this many"
+        }
+      ],
+      "scope": "application"
+    },
+    {
+      "description": "Work items in progress that nobody has touched for a number of days.",
+      "kind": "stale_items",
+      "name": "Stalled work",
+      "params": [
+        {
+          "default": 14,
+          "key": "days",
+          "label": "Days without a change"
+        },
+        {
+          "default": 5,
+          "key": "threshold",
+          "label": "Alert at this many"
+        }
+      ],
+      "scope": "application"
+    },
+    {
+      "description": "Accounts created over a period (by hand, single sign-on or provisioning).",
+      "kind": "new_accounts",
+      "name": "New accounts",
+      "params": [
+        {
+          "default": 60,
+          "key": "window_minutes",
+          "label": "Period in minutes"
+        },
+        {
+          "default": 1,
+          "key": "threshold",
+          "label": "Alert at this many"
+        }
+      ],
+      "scope": "application"
+    }
+  ],
+  "core": {
+    "fields": [
+      {
+        "description": null,
+        "key": "severity",
+        "name": "Severity",
+        "options": [
+          "Critical",
+          "Major",
+          "Minor",
+          "Trivial"
+        ],
+        "type": "select"
+      },
+      {
+        "description": "Where the problem occurs: version, site, system.",
+        "key": "environment",
+        "name": "Environment",
+        "options": null,
+        "type": "text"
+      },
+      {
+        "description": null,
+        "key": "steps_to_reproduce",
+        "name": "Steps to reproduce",
+        "options": null,
+        "type": "textarea"
+      },
+      {
+        "description": null,
+        "key": "acceptance_criteria",
+        "name": "Acceptance criteria",
+        "options": null,
+        "type": "textarea"
+      },
+      {
+        "description": null,
+        "key": "story_points",
+        "name": "Story points",
+        "options": null,
+        "type": "number"
+      },
+      {
+        "description": null,
+        "key": "affected_system",
+        "name": "Affected system",
+        "options": null,
+        "type": "text"
+      },
+      {
+        "description": null,
+        "key": "change_impact",
+        "name": "Impact of change",
+        "options": [
+          "Low",
+          "Medium",
+          "High"
+        ],
+        "type": "select"
+      },
+      {
+        "description": null,
+        "key": "justification",
+        "name": "Justification",
+        "options": null,
+        "type": "textarea"
+      },
+      {
+        "description": null,
+        "key": "root_cause",
+        "name": "Root cause",
+        "options": null,
+        "type": "textarea"
+      },
+      {
+        "description": null,
+        "key": "corrective_action",
+        "name": "Corrective action",
+        "options": null,
+        "type": "textarea"
+      },
+      {
+        "description": null,
+        "key": "hypothesis",
+        "name": "Hypothesis",
+        "options": null,
+        "type": "textarea"
+      },
+      {
+        "description": null,
+        "key": "method",
+        "name": "Method",
+        "options": null,
+        "type": "textarea"
+      },
+      {
+        "description": null,
+        "key": "result_summary",
+        "name": "Result summary",
+        "options": null,
+        "type": "textarea"
+      },
+      {
+        "description": null,
+        "key": "amount",
+        "name": "Amount",
+        "options": null,
+        "type": "number"
+      },
+      {
+        "description": null,
+        "key": "currency",
+        "name": "Currency",
+        "options": [
+          "USD",
+          "EUR",
+          "GBP",
+          "CAD",
+          "JPY",
+          "Other"
+        ],
+        "type": "select"
+      },
+      {
+        "description": null,
+        "key": "cost_center",
+        "name": "Cost center",
+        "options": null,
+        "type": "text"
+      },
+      {
+        "description": null,
+        "key": "vendor",
+        "name": "Vendor",
+        "options": null,
+        "type": "text"
+      },
+      {
+        "description": null,
+        "key": "needed_by",
+        "name": "Needed by",
+        "options": null,
+        "type": "date"
+      },
+      {
+        "description": null,
+        "key": "po_number",
+        "name": "Purchase order number",
+        "options": null,
+        "type": "text"
+      },
+      {
+        "description": null,
+        "key": "approver",
+        "name": "Approver",
+        "options": null,
+        "type": "user"
+      },
+      {
+        "description": null,
+        "key": "period",
+        "name": "Accounting period",
+        "options": null,
+        "type": "text"
+      },
+      {
+        "description": null,
+        "key": "counterparty",
+        "name": "Counterparty",
+        "options": null,
+        "type": "text"
+      },
+      {
+        "description": null,
+        "key": "matter_type",
+        "name": "Matter type",
+        "options": [
+          "Contract",
+          "Dispute",
+          "Compliance",
+          "Intellectual property",
+          "Employment",
+          "Other"
+        ],
+        "type": "select"
+      },
+      {
+        "description": null,
+        "key": "jurisdiction",
+        "name": "Jurisdiction",
+        "options": null,
+        "type": "text"
+      },
+      {
+        "description": null,
+        "key": "effective_date",
+        "name": "Effective date",
+        "options": null,
+        "type": "date"
+      },
+      {
+        "description": null,
+        "key": "expiry_date",
+        "name": "Expiry date",
+        "options": null,
+        "type": "date"
+      },
+      {
+        "description": null,
+        "key": "origin",
+        "name": "Origin",
+        "options": null,
+        "type": "text"
+      },
+      {
+        "description": null,
+        "key": "destination",
+        "name": "Destination",
+        "options": null,
+        "type": "text"
+      },
+      {
+        "description": null,
+        "key": "carrier",
+        "name": "Carrier",
+        "options": null,
+        "type": "text"
+      },
+      {
+        "description": null,
+        "key": "tracking_number",
+        "name": "Tracking number",
+        "options": null,
+        "type": "text"
+      },
+      {
+        "description": null,
+        "key": "ship_date",
+        "name": "Ship date",
+        "options": null,
+        "type": "date"
+      },
+      {
+        "description": null,
+        "key": "delivery_date",
+        "name": "Delivery date",
+        "options": null,
+        "type": "date"
+      },
+      {
+        "description": null,
+        "key": "location",
+        "name": "Location",
+        "options": null,
+        "type": "text"
+      },
+      {
+        "description": null,
+        "key": "incident_date",
+        "name": "Date of occurrence",
+        "options": null,
+        "type": "date"
+      },
+      {
+        "description": null,
+        "key": "injury",
+        "name": "Injury involved",
+        "options": null,
+        "type": "checkbox"
+      },
+      {
+        "description": null,
+        "key": "hazard_category",
+        "name": "Hazard category",
+        "options": [
+          "Chemical",
+          "Electrical",
+          "Ergonomic",
+          "Fire",
+          "Mechanical",
+          "Pressure",
+          "Radiation",
+          "Thermal",
+          "Working at height",
+          "Other"
+        ],
+        "type": "select"
+      },
+      {
+        "description": "1 = very unlikely, 5 = near certain.",
+        "key": "likelihood",
+        "name": "Likelihood",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "type": "select"
+      },
+      {
+        "description": "1 = negligible, 5 = severe.",
+        "key": "consequence",
+        "name": "Consequence",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "type": "select"
+      },
+      {
+        "description": null,
+        "key": "mitigation",
+        "name": "Mitigation",
+        "options": null,
+        "type": "textarea"
+      },
+      {
+        "description": null,
+        "key": "decision_outcome",
+        "name": "Decision",
+        "options": null,
+        "type": "textarea"
+      },
+      {
+        "description": null,
+        "key": "impact",
+        "name": "Impact",
+        "options": [
+          "Low",
+          "Medium",
+          "High"
+        ],
+        "type": "select"
+      },
+      {
+        "description": null,
+        "key": "urgency",
+        "name": "Urgency",
+        "options": [
+          "Low",
+          "Medium",
+          "High"
+        ],
+        "type": "select"
+      },
+      {
+        "description": null,
+        "key": "reference_url",
+        "name": "Reference link",
+        "options": null,
+        "type": "url"
+      }
+    ],
+    "item_types": [
+      {
+        "description": "A piece of work.",
+        "fields": null,
+        "key": "task",
+        "name": "Task",
+        "required": null,
+        "workflow": "simple"
+      },
+      {
+        "description": "A dated checkpoint.",
+        "fields": null,
+        "key": "milestone",
+        "name": "Milestone",
+        "required": null,
+        "workflow": "simple"
+      },
+      {
+        "description": "A follow-up owed by one person.",
+        "fields": null,
+        "key": "action_item",
+        "name": "Action item",
+        "required": null,
+        "workflow": "simple"
+      },
+      {
+        "description": "A large body of work split into stories.",
+        "fields": null,
+        "key": "epic",
+        "name": "Epic",
+        "required": null,
+        "workflow": "software"
+      },
+      {
+        "description": "A user-visible capability.",
+        "fields": [
+          {
+            "key": "acceptance_criteria"
+          },
+          {
+            "key": "story_points"
+          }
+        ],
+        "key": "story",
+        "name": "Story",
+        "required": null,
+        "workflow": "software"
+      },
+      {
+        "description": "Something that does not work as intended.",
+        "fields": [
+          {
+            "key": "severity",
+            "required": true
+          },
+          {
+            "key": "environment"
+          },
+          {
+            "key": "steps_to_reproduce"
+          }
+        ],
+        "key": "bug",
+        "name": "Bug",
+        "required": null,
+        "workflow": "software"
+      },
+      {
+        "description": "A controlled change that needs review and approval.",
+        "fields": [
+          {
+            "key": "justification"
+          },
+          {
+            "key": "change_impact"
+          },
+          {
+            "key": "affected_system"
+          }
+        ],
+        "key": "change_request",
+        "name": "Change request",
+        "required": null,
+        "workflow": "change"
+      },
+      {
+        "description": "A study with a hypothesis, a method and a result.",
+        "fields": [
+          {
+            "key": "hypothesis"
+          },
+          {
+            "key": "method"
+          },
+          {
+            "key": "result_summary"
+          }
+        ],
+        "key": "experiment",
+        "name": "Experiment",
+        "required": null,
+        "workflow": "research"
+      },
+      {
+        "description": "A strategic goal that groups work.",
+        "fields": null,
+        "key": "initiative",
+        "name": "Initiative",
+        "required": null,
+        "workflow": "simple"
+      },
+      {
+        "description": "A recorded decision and its rationale.",
+        "fields": [
+          {
+            "key": "decision_outcome"
+          }
+        ],
+        "key": "decision",
+        "name": "Decision",
+        "required": null,
+        "workflow": "decision"
+      },
+      {
+        "description": "Something that may happen and what is being done about it.",
+        "fields": [
+          {
+            "key": "likelihood"
+          },
+          {
+            "key": "consequence"
+          },
+          {
+            "key": "mitigation"
+          }
+        ],
+        "key": "risk",
+        "name": "Risk",
+        "required": null,
+        "workflow": "risk"
+      },
+      {
+        "description": "Work that needs a named approver.",
+        "fields": [
+          {
+            "key": "approver"
+          },
+          {
+            "key": "amount"
+          },
+          {
+            "key": "currency"
+          },
+          {
+            "key": "period"
+          },
+          {
+            "key": "cost_center"
+          }
+        ],
+        "key": "approval",
+        "name": "Approval",
+        "required": null,
+        "workflow": "approval"
+      },
+      {
+        "description": "A legal matter.",
+        "fields": [
+          {
+            "key": "matter_type",
+            "required": true
+          },
+          {
+            "key": "counterparty"
+          },
+          {
+            "key": "jurisdiction"
+          },
+          {
+            "key": "effective_date"
+          },
+          {
+            "key": "expiry_date"
+          }
+        ],
+        "key": "matter",
+        "name": "Matter",
+        "required": null,
+        "workflow": "legal"
+      },
+      {
+        "description": "Review of a contract or amendment.",
+        "fields": [
+          {
+            "key": "counterparty",
+            "required": true
+          },
+          {
+            "key": "amount"
+          },
+          {
+            "key": "currency"
+          },
+          {
+            "key": "effective_date"
+          },
+          {
+            "key": "expiry_date"
+          },
+          {
+            "key": "reference_url"
+          }
+        ],
+        "key": "contract_review",
+        "name": "Contract review",
+        "required": null,
+        "workflow": "legal"
+      },
+      {
+        "description": "Goods moving from origin to destination.",
+        "fields": [
+          {
+            "key": "origin",
+            "required": true
+          },
+          {
+            "key": "destination",
+            "required": true
+          },
+          {
+            "key": "carrier"
+          },
+          {
+            "key": "tracking_number"
+          },
+          {
+            "key": "ship_date"
+          },
+          {
+            "key": "delivery_date"
+          }
+        ],
+        "key": "shipment",
+        "name": "Shipment",
+        "required": null,
+        "workflow": "shipment"
+      },
+      {
+        "description": "Delay, damage, shortage or customs hold.",
+        "fields": [
+          {
+            "key": "tracking_number"
+          },
+          {
+            "key": "root_cause"
+          }
+        ],
+        "key": "logistics_exception",
+        "name": "Logistics exception",
+        "required": null,
+        "workflow": "simple"
+      },
+      {
+        "description": "A request to buy goods or services.",
+        "fields": [
+          {
+            "key": "amount"
+          },
+          {
+            "key": "currency"
+          },
+          {
+            "key": "vendor"
+          },
+          {
+            "key": "cost_center"
+          },
+          {
+            "key": "needed_by"
+          },
+          {
+            "key": "justification"
+          },
+          {
+            "key": "po_number"
+          }
+        ],
+        "key": "purchase_request",
+        "name": "Purchase request",
+        "required": null,
+        "workflow": "procurement"
+      },
+      {
+        "description": "Assessment of a supplier.",
+        "fields": [
+          {
+            "key": "vendor",
+            "required": true
+          },
+          {
+            "key": "result_summary"
+          }
+        ],
+        "key": "vendor_evaluation",
+        "name": "Vendor evaluation",
+        "required": null,
+        "workflow": "simple"
+      },
+      {
+        "description": "An injury, near miss or unsafe condition.",
+        "fields": [
+          {
+            "key": "location",
+            "required": true
+          },
+          {
+            "key": "incident_date",
+            "required": true
+          },
+          {
+            "key": "injury"
+          },
+          {
+            "key": "hazard_category"
+          },
+          {
+            "key": "root_cause"
+          },
+          {
+            "key": "corrective_action"
+          }
+        ],
+        "key": "incident_report",
+        "name": "Incident report",
+        "required": null,
+        "workflow": "safety"
+      },
+      {
+        "description": "A source of potential harm and its controls.",
+        "fields": [
+          {
+            "key": "hazard_category"
+          },
+          {
+            "key": "location"
+          },
+          {
+            "key": "likelihood"
+          },
+          {
+            "key": "consequence"
+          },
+          {
+            "key": "mitigation"
+          }
+        ],
+        "key": "hazard",
+        "name": "Hazard",
+        "required": null,
+        "workflow": "risk"
+      },
+      {
+        "description": "An action that removes a cause.",
+        "fields": [
+          {
+            "key": "root_cause"
+          }
+        ],
+        "key": "corrective_action",
+        "name": "Corrective action",
+        "required": null,
+        "workflow": "simple"
+      },
+      {
+        "description": "A scheduled check.",
+        "fields": [
+          {
+            "key": "location"
+          },
+          {
+            "key": "result_summary"
+          }
+        ],
+        "key": "inspection",
+        "name": "Inspection",
+        "required": null,
+        "workflow": "simple"
+      },
+      {
+        "description": "A request for something standard.",
+        "fields": [
+          {
+            "key": "affected_system"
+          }
+        ],
+        "key": "service_request",
+        "name": "Service request",
+        "required": null,
+        "workflow": "service"
+      },
+      {
+        "description": "An unplanned interruption or degradation.",
+        "fields": [
+          {
+            "key": "impact"
+          },
+          {
+            "key": "urgency"
+          },
+          {
+            "key": "affected_system"
+          }
+        ],
+        "key": "incident",
+        "name": "Incident",
+        "required": null,
+        "workflow": "service"
+      },
+      {
+        "description": "The underlying cause of one or more incidents.",
+        "fields": [
+          {
+            "key": "root_cause"
+          },
+          {
+            "key": "corrective_action"
+          }
+        ],
+        "key": "problem",
+        "name": "Problem",
+        "required": null,
+        "workflow": "service"
+      }
+    ],
+    "page_templates": [
+      {
+        "category": "General",
+        "description": "Start from nothing.",
+        "key": "blank",
+        "name": "Blank page"
+      },
+      {
+        "category": "General",
+        "description": "Agenda, notes, decisions and actions.",
+        "key": "meeting-notes",
+        "name": "Meeting notes"
+      },
+      {
+        "category": "General",
+        "description": "Context, options, decision and consequences.",
+        "key": "decision-record",
+        "name": "Decision record"
+      },
+      {
+        "category": "Management",
+        "description": "Purpose, scope, people, schedule and risks on one page.",
+        "key": "project-brief",
+        "name": "Project brief"
+      },
+      {
+        "category": "Management",
+        "description": "Progress, next steps, risks and decisions needed.",
+        "key": "status-report",
+        "name": "Status report"
+      },
+      {
+        "category": "Engineering",
+        "description": "Problem, goals, design, alternatives and rollout.",
+        "key": "design-doc",
+        "name": "Design document"
+      },
+      {
+        "category": "Engineering",
+        "description": "Numbered, verifiable requirements with rationale.",
+        "key": "requirements-spec",
+        "name": "Requirements specification"
+      },
+      {
+        "category": "Operations",
+        "description": "How to operate or recover a system, step by step.",
+        "key": "runbook",
+        "name": "Runbook"
+      },
+      {
+        "category": "Operations",
+        "description": "Blameless review: what happened, why, and what changes.",
+        "key": "postmortem",
+        "name": "Incident review"
+      },
+      {
+        "category": "Operations",
+        "description": "Purpose, responsibilities and a controlled procedure.",
+        "key": "sop",
+        "name": "Standard operating procedure"
+      },
+      {
+        "category": "Knowledge base",
+        "description": "A short answer to one question.",
+        "key": "kb-how-to",
+        "name": "How-to article"
+      },
+      {
+        "category": "Knowledge base",
+        "description": "Symptom, cause and fix.",
+        "key": "kb-troubleshooting",
+        "name": "Troubleshooting article"
+      }
+    ],
+    "project_templates": [
+      {
+        "description": "Tasks, milestones, decisions, action items and risks. A sensible start for any team.",
+        "domain": "General",
+        "item_types": [
+          "task",
+          "milestone",
+          "decision",
+          "action_item",
+          "risk"
+        ],
+        "key": "basic",
+        "kind": "standard",
+        "name": "Task tracking"
+      },
+      {
+        "description": "Epics, stories, tasks and bugs on a backlog-to-done board, with cycles for sprints.",
+        "domain": "Software engineering",
+        "item_types": [
+          "epic",
+          "story",
+          "task",
+          "bug"
+        ],
+        "key": "software",
+        "kind": "standard",
+        "name": "Software delivery"
+      },
+      {
+        "description": "Change requests that must be justified, reviewed and approved before implementation and verification.",
+        "domain": "General engineering",
+        "item_types": [
+          "change_request",
+          "task",
+          "risk",
+          "action_item",
+          "decision"
+        ],
+        "key": "engineering-change",
+        "kind": "standard",
+        "name": "Engineering change control"
+      },
+      {
+        "description": "Experiments from hypothesis to result, with supporting tasks and recorded decisions.",
+        "domain": "Science",
+        "item_types": [
+          "experiment",
+          "task",
+          "decision",
+          "risk"
+        ],
+        "key": "research",
+        "kind": "standard",
+        "name": "Research program"
+      },
+      {
+        "description": "Strategic initiatives, milestones, decisions, action items and a risk register.",
+        "domain": "Management",
+        "item_types": [
+          "initiative",
+          "milestone",
+          "decision",
+          "action_item",
+          "risk"
+        ],
+        "key": "management",
+        "kind": "standard",
+        "name": "Initiatives and decisions"
+      },
+      {
+        "description": "Period-close tasks and approvals with a named approver.",
+        "domain": "Finance",
+        "item_types": [
+          "approval",
+          "task"
+        ],
+        "key": "finance",
+        "kind": "standard",
+        "name": "Finance approvals and close"
+      },
+      {
+        "description": "Matters and contract reviews from intake to execution.",
+        "domain": "Legal",
+        "item_types": [
+          "matter",
+          "contract_review",
+          "task"
+        ],
+        "key": "legal",
+        "kind": "standard",
+        "name": "Legal matters"
+      },
+      {
+        "description": "Shipments from planning to delivery, with exceptions tracked alongside.",
+        "domain": "Logistics",
+        "item_types": [
+          "shipment",
+          "logistics_exception",
+          "task"
+        ],
+        "key": "logistics",
+        "kind": "standard",
+        "name": "Shipments"
+      },
+      {
+        "description": "Purchase requests through approval, ordering and receipt, plus vendor evaluations.",
+        "domain": "Procurement",
+        "item_types": [
+          "purchase_request",
+          "vendor_evaluation",
+          "task"
+        ],
+        "key": "procurement",
+        "kind": "standard",
+        "name": "Purchasing"
+      },
+      {
+        "description": "Incident reports, hazards, corrective actions and inspections.",
+        "domain": "Safety",
+        "item_types": [
+          "incident_report",
+          "hazard",
+          "corrective_action",
+          "inspection"
+        ],
+        "key": "safety",
+        "kind": "standard",
+        "name": "Safety management"
+      },
+      {
+        "description": "A portal for staff, queues for agents, response and resolution targets, and a linked knowledge base.",
+        "domain": "Service desk",
+        "item_types": [
+          "service_request",
+          "incident",
+          "problem",
+          "change_request"
+        ],
+        "key": "it-service-desk",
+        "kind": "service_desk",
+        "name": "IT service desk"
+      },
+      {
+        "description": "For HR, facilities, finance or legal intake: a portal, queues and targets without IT terminology.",
+        "domain": "Service desk",
+        "item_types": [
+          "service_request",
+          "task"
+        ],
+        "key": "business-service-desk",
+        "kind": "service_desk",
+        "name": "Business service desk"
+      }
+    ],
+    "workflows": [
+      {
+        "description": null,
+        "initial": "todo",
+        "key": "simple",
+        "name": "Simple",
+        "statuses": [
+          {
+            "category": "todo",
+            "key": "todo",
+            "name": "To do"
+          },
+          {
+            "category": "in_progress",
+            "key": "in_progress",
+            "name": "In progress"
+          },
+          {
+            "category": "done",
+            "key": "done",
+            "name": "Done"
+          }
+        ],
+        "transitions": [
+          {
+            "from": [
+              "*"
+            ],
+            "name": "Move to To do",
+            "to": "todo"
+          },
+          {
+            "from": [
+              "*"
+            ],
+            "name": "Start",
+            "to": "in_progress"
+          },
+          {
+            "from": [
+              "*"
+            ],
+            "name": "Complete",
+            "to": "done"
+          }
+        ]
+      },
+      {
+        "description": null,
+        "initial": "backlog",
+        "key": "software",
+        "name": "Software delivery",
+        "statuses": [
+          {
+            "category": "todo",
+            "key": "backlog",
+            "name": "Backlog"
+          },
+          {
+            "category": "todo",
+            "key": "todo",
+            "name": "To do"
+          },
+          {
+            "category": "in_progress",
+            "key": "in_progress",
+            "name": "In progress"
+          },
+          {
+            "category": "in_progress",
+            "key": "in_review",
+            "name": "In review"
+          },
+          {
+            "category": "done",
+            "key": "done",
+            "name": "Done"
+          }
+        ],
+        "transitions": [
+          {
+            "from": [
+              "*"
+            ],
+            "name": "Send to backlog",
+            "to": "backlog"
+          },
+          {
+            "from": [
+              "*"
+            ],
+            "name": "Plan",
+            "to": "todo"
+          },
+          {
+            "from": [
+              "*"
+            ],
+            "name": "Start",
+            "to": "in_progress"
+          },
+          {
+            "from": [
+              "*"
+            ],
+            "name": "Request review",
+            "to": "in_review"
+          },
+          {
+            "from": [
+              "*"
+            ],
+            "name": "Complete",
+            "to": "done"
+          }
+        ]
+      },
+      {
+        "description": null,
+        "initial": "open",
+        "key": "service",
+        "name": "Service request",
+        "statuses": [
+          {
+            "category": "todo",
+            "key": "open",
+            "name": "Open"
+          },
+          {
+            "category": "in_progress",
+            "key": "in_progress",
+            "name": "In progress"
+          },
+          {
+            "category": "in_progress",
+            "key": "waiting_customer",
+            "name": "Waiting for customer"
+          },
+          {
+            "category": "done",
+            "key": "resolved",
+            "name": "Resolved"
+          },
+          {
+            "category": "done",
+            "key": "closed",
+            "name": "Closed"
+          }
+        ],
+        "transitions": [
+          {
+            "from": [
+              "open",
+              "waiting_customer"
+            ],
+            "name": "Start work",
+            "to": "in_progress"
+          },
+          {
+            "from": [
+              "open",
+              "in_progress"
+            ],
+            "name": "Ask customer",
+            "to": "waiting_customer"
+          },
+          {
+            "from": [
+              "open",
+              "in_progress",
+              "waiting_customer"
+            ],
+            "name": "Resolve",
+            "to": "resolved"
+          },
+          {
+            "from": [
+              "resolved",
+              "closed"
+            ],
+            "name": "Reopen",
+            "to": "open"
+          },
+          {
+            "from": [
+              "resolved"
+            ],
+            "name": "Close",
+            "to": "closed"
+          }
+        ]
+      },
+      {
+        "description": null,
+        "initial": "draft",
+        "key": "change",
+        "name": "Controlled change",
+        "statuses": [
+          {
+            "category": "todo",
+            "key": "draft",
+            "name": "Draft"
+          },
+          {
+            "category": "in_progress",
+            "key": "in_review",
+            "name": "In review"
+          },
+          {
+            "category": "in_progress",
+            "key": "approved",
+            "name": "Approved"
+          },
+          {
+            "category": "in_progress",
+            "key": "implementing",
+            "name": "Implementing"
+          },
+          {
+            "category": "in_progress",
+            "key": "verified",
+            "name": "Verified"
+          },
+          {
+            "category": "done",
+            "key": "closed",
+            "name": "Closed"
+          },
+          {
+            "category": "done",
+            "key": "rejected",
+            "name": "Rejected"
+          }
+        ],
+        "transitions": [
+          {
+            "from": [
+              "draft"
+            ],
+            "name": "Submit for review",
+            "requires": [
+              "justification"
+            ],
+            "to": "in_review"
+          },
+          {
+            "from": [
+              "in_review"
+            ],
+            "name": "Return to author",
+            "to": "draft"
+          },
+          {
+            "from": [
+              "in_review"
+            ],
+            "name": "Approve",
+            "requires": [
+              "change_impact"
+            ],
+            "to": "approved"
+          },
+          {
+            "from": [
+              "in_review"
+            ],
+            "name": "Reject",
+            "to": "rejected"
+          },
+          {
+            "from": [
+              "approved"
+            ],
+            "name": "Begin implementation",
+            "to": "implementing"
+          },
+          {
+            "from": [
+              "implementing"
+            ],
+            "name": "Mark verified",
+            "to": "verified"
+          },
+          {
+            "from": [
+              "verified"
+            ],
+            "name": "Close",
+            "to": "closed"
+          },
+          {
+            "from": [
+              "rejected",
+              "closed"
+            ],
+            "name": "Reopen",
+            "to": "draft"
+          }
+        ]
+      },
+      {
+        "description": null,
+        "initial": "proposed",
+        "key": "research",
+        "name": "Research",
+        "statuses": [
+          {
+            "category": "todo",
+            "key": "proposed",
+            "name": "Proposed"
+          },
+          {
+            "category": "todo",
+            "key": "planned",
+            "name": "Planned"
+          },
+          {
+            "category": "in_progress",
+            "key": "running",
+            "name": "Running"
+          },
+          {
+            "category": "in_progress",
+            "key": "analysis",
+            "name": "Analysis"
+          },
+          {
+            "category": "done",
+            "key": "complete",
+            "name": "Complete"
+          },
+          {
+            "category": "done",
+            "key": "abandoned",
+            "name": "Abandoned"
+          }
+        ],
+        "transitions": [
+          {
+            "from": [
+              "proposed"
+            ],
+            "name": "Plan",
+            "requires": [
+              "hypothesis"
+            ],
+            "to": "planned"
+          },
+          {
+            "from": [
+              "planned",
+              "analysis"
+            ],
+            "name": "Start run",
+            "to": "running"
+          },
+          {
+            "from": [
+              "running"
+            ],
+            "name": "Analyze",
+            "to": "analysis"
+          },
+          {
+            "from": [
+              "analysis"
+            ],
+            "name": "Complete",
+            "requires": [
+              "result_summary"
+            ],
+            "to": "complete"
+          },
+          {
+            "from": [
+              "proposed",
+              "planned",
+              "running",
+              "analysis"
+            ],
+            "name": "Abandon",
+            "to": "abandoned"
+          },
+          {
+            "from": [
+              "complete",
+              "abandoned"
+            ],
+            "name": "Reopen",
+            "to": "proposed"
+          }
+        ]
+      },
+      {
+        "description": null,
+        "initial": "todo",
+        "key": "approval",
+        "name": "Approval",
+        "statuses": [
+          {
+            "category": "todo",
+            "key": "todo",
+            "name": "To do"
+          },
+          {
+            "category": "in_progress",
+            "key": "in_progress",
+            "name": "In progress"
+          },
+          {
+            "category": "in_progress",
+            "key": "awaiting_approval",
+            "name": "Awaiting approval"
+          },
+          {
+            "category": "done",
+            "key": "approved",
+            "name": "Approved"
+          },
+          {
+            "category": "done",
+            "key": "declined",
+            "name": "Declined"
+          }
+        ],
+        "transitions": [
+          {
+            "from": [
+              "todo"
+            ],
+            "name": "Start",
+            "to": "in_progress"
+          },
+          {
+            "from": [
+              "todo",
+              "in_progress"
+            ],
+            "name": "Request approval",
+            "requires": [
+              "approver"
+            ],
+            "to": "awaiting_approval"
+          },
+          {
+            "from": [
+              "awaiting_approval"
+            ],
+            "name": "Approve",
+            "to": "approved"
+          },
+          {
+            "from": [
+              "awaiting_approval"
+            ],
+            "name": "Decline",
+            "to": "declined"
+          },
+          {
+            "from": [
+              "awaiting_approval",
+              "declined"
+            ],
+            "name": "Rework",
+            "to": "in_progress"
+          }
+        ]
+      },
+      {
+        "description": null,
+        "initial": "intake",
+        "key": "legal",
+        "name": "Legal matter",
+        "statuses": [
+          {
+            "category": "todo",
+            "key": "intake",
+            "name": "Intake"
+          },
+          {
+            "category": "in_progress",
+            "key": "in_review",
+            "name": "In review"
+          },
+          {
+            "category": "in_progress",
+            "key": "negotiation",
+            "name": "Negotiation"
+          },
+          {
+            "category": "in_progress",
+            "key": "awaiting_signature",
+            "name": "Awaiting signature"
+          },
+          {
+            "category": "done",
+            "key": "executed",
+            "name": "Executed"
+          },
+          {
+            "category": "done",
+            "key": "closed",
+            "name": "Closed"
+          }
+        ],
+        "transitions": [
+          {
+            "from": [
+              "intake"
+            ],
+            "name": "Accept for review",
+            "to": "in_review"
+          },
+          {
+            "from": [
+              "in_review",
+              "awaiting_signature"
+            ],
+            "name": "Negotiate",
+            "to": "negotiation"
+          },
+          {
+            "from": [
+              "in_review",
+              "negotiation"
+            ],
+            "name": "Send for signature",
+            "to": "awaiting_signature"
+          },
+          {
+            "from": [
+              "awaiting_signature"
+            ],
+            "name": "Mark executed",
+            "requires": [
+              "effective_date"
+            ],
+            "to": "executed"
+          },
+          {
+            "from": [
+              "intake",
+              "in_review",
+              "negotiation",
+              "executed"
+            ],
+            "name": "Close",
+            "to": "closed"
+          },
+          {
+            "from": [
+              "closed"
+            ],
+            "name": "Reopen",
+            "to": "in_review"
+          }
+        ]
+      },
+      {
+        "description": null,
+        "initial": "planned",
+        "key": "shipment",
+        "name": "Shipment",
+        "statuses": [
+          {
+            "category": "todo",
+            "key": "planned",
+            "name": "Planned"
+          },
+          {
+            "category": "in_progress",
+            "key": "picked",
+            "name": "Picked and packed"
+          },
+          {
+            "category": "in_progress",
+            "key": "in_transit",
+            "name": "In transit"
+          },
+          {
+            "category": "in_progress",
+            "key": "exception",
+            "name": "Exception"
+          },
+          {
+            "category": "done",
+            "key": "delivered",
+            "name": "Delivered"
+          },
+          {
+            "category": "done",
+            "key": "closed",
+            "name": "Closed"
+          }
+        ],
+        "transitions": [
+          {
+            "from": [
+              "planned"
+            ],
+            "name": "Pick and pack",
+            "to": "picked"
+          },
+          {
+            "from": [
+              "picked",
+              "exception"
+            ],
+            "name": "Dispatch",
+            "requires": [
+              "carrier"
+            ],
+            "to": "in_transit"
+          },
+          {
+            "from": [
+              "picked",
+              "in_transit"
+            ],
+            "name": "Raise exception",
+            "to": "exception"
+          },
+          {
+            "from": [
+              "in_transit"
+            ],
+            "name": "Confirm delivery",
+            "to": "delivered"
+          },
+          {
+            "from": [
+              "delivered",
+              "exception"
+            ],
+            "name": "Close",
+            "to": "closed"
+          }
+        ]
+      },
+      {
+        "description": null,
+        "initial": "draft",
+        "key": "procurement",
+        "name": "Procurement",
+        "statuses": [
+          {
+            "category": "todo",
+            "key": "draft",
+            "name": "Draft"
+          },
+          {
+            "category": "in_progress",
+            "key": "submitted",
+            "name": "Submitted"
+          },
+          {
+            "category": "in_progress",
+            "key": "approved",
+            "name": "Approved"
+          },
+          {
+            "category": "in_progress",
+            "key": "ordered",
+            "name": "Ordered"
+          },
+          {
+            "category": "done",
+            "key": "received",
+            "name": "Received"
+          },
+          {
+            "category": "done",
+            "key": "rejected",
+            "name": "Rejected"
+          },
+          {
+            "category": "done",
+            "key": "canceled",
+            "name": "Canceled"
+          }
+        ],
+        "transitions": [
+          {
+            "from": [
+              "draft"
+            ],
+            "name": "Submit",
+            "requires": [
+              "amount",
+              "justification"
+            ],
+            "to": "submitted"
+          },
+          {
+            "from": [
+              "submitted"
+            ],
+            "name": "Return to requester",
+            "to": "draft"
+          },
+          {
+            "from": [
+              "submitted"
+            ],
+            "name": "Approve",
+            "to": "approved"
+          },
+          {
+            "from": [
+              "submitted"
+            ],
+            "name": "Reject",
+            "to": "rejected"
+          },
+          {
+            "from": [
+              "approved"
+            ],
+            "name": "Place order",
+            "requires": [
+              "vendor"
+            ],
+            "to": "ordered"
+          },
+          {
+            "from": [
+              "ordered"
+            ],
+            "name": "Confirm receipt",
+            "to": "received"
+          },
+          {
+            "from": [
+              "draft",
+              "submitted",
+              "approved",
+              "ordered"
+            ],
+            "name": "Cancel",
+            "to": "canceled"
+          }
+        ]
+      },
+      {
+        "description": null,
+        "initial": "reported",
+        "key": "safety",
+        "name": "Safety event",
+        "statuses": [
+          {
+            "category": "todo",
+            "key": "reported",
+            "name": "Reported"
+          },
+          {
+            "category": "in_progress",
+            "key": "triage",
+            "name": "Triage"
+          },
+          {
+            "category": "in_progress",
+            "key": "investigating",
+            "name": "Investigating"
+          },
+          {
+            "category": "in_progress",
+            "key": "corrective_action",
+            "name": "Corrective action"
+          },
+          {
+            "category": "in_progress",
+            "key": "verification",
+            "name": "Verification"
+          },
+          {
+            "category": "done",
+            "key": "closed",
+            "name": "Closed"
+          }
+        ],
+        "transitions": [
+          {
+            "from": [
+              "reported"
+            ],
+            "name": "Triage",
+            "to": "triage"
+          },
+          {
+            "from": [
+              "triage"
+            ],
+            "name": "Investigate",
+            "to": "investigating"
+          },
+          {
+            "from": [
+              "investigating"
+            ],
+            "name": "Assign corrective action",
+            "requires": [
+              "root_cause"
+            ],
+            "to": "corrective_action"
+          },
+          {
+            "from": [
+              "corrective_action"
+            ],
+            "name": "Verify effectiveness",
+            "requires": [
+              "corrective_action"
+            ],
+            "to": "verification"
+          },
+          {
+            "from": [
+              "triage",
+              "verification"
+            ],
+            "name": "Close",
+            "to": "closed"
+          },
+          {
+            "from": [
+              "closed"
+            ],
+            "name": "Reopen",
+            "to": "investigating"
+          }
+        ]
+      },
+      {
+        "description": null,
+        "initial": "identified",
+        "key": "risk",
+        "name": "Risk",
+        "statuses": [
+          {
+            "category": "todo",
+            "key": "identified",
+            "name": "Identified"
+          },
+          {
+            "category": "in_progress",
+            "key": "assessed",
+            "name": "Assessed"
+          },
+          {
+            "category": "in_progress",
+            "key": "mitigating",
+            "name": "Mitigating"
+          },
+          {
+            "category": "done",
+            "key": "accepted",
+            "name": "Accepted"
+          },
+          {
+            "category": "done",
+            "key": "closed",
+            "name": "Closed"
+          }
+        ],
+        "transitions": [
+          {
+            "from": [
+              "identified"
+            ],
+            "name": "Assess",
+            "requires": [
+              "likelihood",
+              "consequence"
+            ],
+            "to": "assessed"
+          },
+          {
+            "from": [
+              "assessed"
+            ],
+            "name": "Mitigate",
+            "requires": [
+              "mitigation"
+            ],
+            "to": "mitigating"
+          },
+          {
+            "from": [
+              "assessed",
+              "mitigating"
+            ],
+            "name": "Accept",
+            "to": "accepted"
+          },
+          {
+            "from": [
+              "assessed",
+              "mitigating",
+              "accepted"
+            ],
+            "name": "Close",
+            "to": "closed"
+          },
+          {
+            "from": [
+              "accepted",
+              "closed"
+            ],
+            "name": "Reopen",
+            "to": "identified"
+          }
+        ]
+      },
+      {
+        "description": null,
+        "initial": "proposed",
+        "key": "decision",
+        "name": "Decision",
+        "statuses": [
+          {
+            "category": "todo",
+            "key": "proposed",
+            "name": "Proposed"
+          },
+          {
+            "category": "done",
+            "key": "decided",
+            "name": "Decided"
+          },
+          {
+            "category": "done",
+            "key": "superseded",
+            "name": "Superseded"
+          }
+        ],
+        "transitions": [
+          {
+            "from": [
+              "proposed"
+            ],
+            "name": "Decide",
+            "requires": [
+              "decision_outcome"
+            ],
+            "to": "decided"
+          },
+          {
+            "from": [
+              "decided"
+            ],
+            "name": "Supersede",
+            "to": "superseded"
+          },
+          {
+            "from": [
+              "decided",
+              "superseded"
+            ],
+            "name": "Reopen",
+            "to": "proposed"
+          }
+        ]
+      }
+    ]
+  },
+  "default_config": "[server]\nbind = \"127.0.0.1:8600\"\npublic_url = \"\"\nweb_root = \"/usr/share/gantry/web\"\nmanual_root = \"/usr/share/gantry/manual\"\ntrusted_proxies = [\n    \"127.0.0.1\",\n    \"::1\",\n]\nmax_body_mb = 25\nrate_limit_per_minute = 600\nmetrics_token = \"\"\n\n[database]\nurl = \"postgres://gantry@%2Fvar%2Frun%2Fpostgresql/gantry\"\nmax_connections = 20\n\n[auth]\nallow_local_login = true\npassword_min_length = 12\nsession_idle_minutes = 480\nsession_absolute_hours = 168\nlockout_threshold = 10\nlockout_minutes = 15\nlogin_attempts_per_ip = 30\n\n[security]\nsecret_key_file = \"\"\nblock_private_networks = false\nallow_insecure_outbound = false\n\n[logging]\nformat = \"json\"\nlevel = \"info\"\n\n[storage.blob]\nbackend = \"fs\"\npath = \"/var/lib/gantry/blobs\"\nendpoint = \"\"\nbucket = \"gantry\"\nregion = \"us-east-1\"\naccess_key = \"\"\n\n[storage.search]\nbackend = \"pg\"\nurl = \"\"\nindex = \"gantry\"\nusername = \"\"\n\n[storage.vector]\nbackend = \"pg_array\"\n\n[storage.kv]\nbackend = \"pg\"\n\n[ai.embeddings]\nprovider = \"none\"\nbase_url = \"\"\nmodel = \"\"\ndimensions = 256\nmin_similarity = 0.2\n\n[worker]\nembedded = true\nconcurrency = 4\npoll_seconds = 2\n\n[addons]\ndir = \"/usr/share/gantry/addons\"\n\n[integrations]\ntimeout_seconds = 15\n\n[email]\nenabled = false\nhost = \"\"\nport = 587\nencryption = \"starttls\"\nusername = \"\"\npassword_file = \"\"\nfrom = \"\"\nreply_to = \"\"\ntimeout_seconds = 20\n\n[realtime]\nenabled = true\nmax_connections_per_user = 12\nmax_messages_per_second = 60\n",
+  "events": [
+    {
+      "description": "A work item was created",
+      "kind": "item.created"
+    },
+    {
+      "description": "Fields of a work item changed",
+      "kind": "item.updated"
+    },
+    {
+      "description": "A work item was assigned",
+      "kind": "item.assigned"
+    },
+    {
+      "description": "A work item moved to another status",
+      "kind": "item.transitioned"
+    },
+    {
+      "description": "A message was added to a work item's discussion",
+      "kind": "comment.created"
+    },
+    {
+      "description": "Someone was mentioned in a discussion, a description or a page",
+      "kind": "mention.created"
+    },
+    {
+      "description": "A service desk request was raised through the portal",
+      "kind": "request.created"
+    },
+    {
+      "description": "A service-level target was missed",
+      "kind": "sla.breached"
+    },
+    {
+      "description": "A documentation page was published",
+      "kind": "page.created"
+    },
+    {
+      "description": "A published page changed",
+      "kind": "page.updated"
+    },
+    {
+      "description": "An administrator's alert rule went over its threshold",
+      "kind": "alert.firing"
+    },
+    {
+      "description": "An alert rule returned to normal",
+      "kind": "alert.resolved"
+    }
+  ],
+  "integrations": [
+    {
+      "description": "Post event messages to a channel and accept the /gantry slash command.",
+      "direction": "outbound and inbound",
+      "kind": "slack",
+      "name": "Slack",
+      "secrets": [
+        {
+          "key": "webhook_url",
+          "label": "Incoming webhook URL",
+          "required": false
+        },
+        {
+          "key": "signing_secret",
+          "label": "App signing secret (for the slash command)",
+          "required": false
+        }
+      ],
+      "settings": [
+        {
+          "key": "acting_user_id",
+          "label": "User the slash command acts as (id)",
+          "required": false
+        }
+      ]
+    },
+    {
+      "description": "Post Adaptive Cards to a channel through a Workflows webhook.",
+      "direction": "outbound",
+      "kind": "teams",
+      "name": "Microsoft Teams",
+      "secrets": [
+        {
+          "key": "workflow_url",
+          "label": "Workflows webhook URL",
+          "required": true
+        }
+      ],
+      "settings": []
+    },
+    {
+      "description": "POST signed JSON events to any HTTPS endpoint (Standard Webhooks signature).",
+      "direction": "outbound",
+      "kind": "webhook",
+      "name": "Generic webhook",
+      "secrets": [
+        {
+          "key": "signing_secret",
+          "label": "Signing secret (generated when left empty)",
+          "required": false
+        }
+      ],
+      "settings": [
+        {
+          "key": "url",
+          "label": "Endpoint URL",
+          "required": true
+        }
+      ]
+    },
+    {
+      "description": "Link commits and pull requests that mention a work item key; optionally complete items when a pull request merges.",
+      "direction": "inbound",
+      "kind": "github",
+      "name": "GitHub",
+      "secrets": [
+        {
+          "key": "webhook_secret",
+          "label": "Webhook secret",
+          "required": true
+        }
+      ],
+      "settings": [
+        {
+          "key": "auto_transition",
+          "label": "Complete items on merge when the description says \"fixes KEY\" (true/false)",
+          "required": false
+        }
+      ]
+    },
+    {
+      "description": "Link commits and merge requests that mention a work item key; optionally complete items on merge.",
+      "direction": "inbound",
+      "kind": "gitlab",
+      "name": "GitLab",
+      "secrets": [
+        {
+          "key": "signing_token",
+          "label": "Signing token (whsec_…, GitLab 19.0+)",
+          "required": false
+        },
+        {
+          "key": "secret_token",
+          "label": "Secret token (older GitLab)",
+          "required": false
+        }
+      ],
+      "settings": [
+        {
+          "key": "auto_transition",
+          "label": "Complete items on merge when the description says \"closes KEY\" (true/false)",
+          "required": false
+        }
+      ]
+    },
+    {
+      "description": "Import issues from Jira Cloud or Data Center by JQL. Re-running an import updates items it created.",
+      "direction": "import",
+      "kind": "jira",
+      "name": "Atlassian Jira",
+      "secrets": [
+        {
+          "key": "api_token",
+          "label": "API token (Cloud) or personal access token (Data Center)",
+          "required": true
+        }
+      ],
+      "settings": [
+        {
+          "key": "base_url",
+          "label": "Jira base URL",
+          "required": true
+        },
+        {
+          "key": "deployment",
+          "label": "cloud or datacenter",
+          "required": true
+        },
+        {
+          "key": "email",
+          "label": "Account email (Cloud only)",
+          "required": false
+        }
+      ]
+    }
+  ],
+  "mcp_tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Search work items and documentation pages visible to you. Returns keys, titles, links and snippets.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "description": "Restrict to one kind",
+            "enum": [
+              "item",
+              "page"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search",
+      "title": "Search"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the projects you can see, with open item counts.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_projects",
+      "title": "List projects"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "A project's work item types, each with its custom fields and workflow (statuses and transitions), plus cycles and members.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "project": {
+            "description": "Project key, e.g. OPS",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project"
+        ],
+        "type": "object"
+      },
+      "name": "get_project",
+      "title": "Get project"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List work items with filters. All filters are optional and combine with AND.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "assignee": {
+            "description": "me, none, or a user id",
+            "type": "string"
+          },
+          "category": {
+            "description": "todo, in_progress, done (comma separated)",
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "overdue": {
+            "type": "boolean"
+          },
+          "project": {
+            "type": "string"
+          },
+          "q": {
+            "description": "Text in the title",
+            "type": "string"
+          },
+          "sort": {
+            "enum": [
+              "updated",
+              "created",
+              "priority",
+              "due",
+              "rank",
+              "key",
+              "sla"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "description": "Status key(s), comma separated",
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_work_items",
+      "title": "List work items"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "One work item with description, custom fields, comments, links, history and the transitions allowed from its current status.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "description": "Item key, e.g. OPS-12",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key"
+        ],
+        "type": "object"
+      },
+      "name": "get_work_item",
+      "title": "Get work item"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create a work item. Use get_project first to learn valid types and custom field keys.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "assignee_id": {
+            "type": "string"
+          },
+          "custom": {
+            "description": "Custom field values by field key",
+            "type": "object"
+          },
+          "description": {
+            "description": "Markdown",
+            "type": "string"
+          },
+          "due_date": {
+            "format": "date",
+            "type": "string"
+          },
+          "labels": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "parent": {
+            "description": "Key of the parent item",
+            "type": "string"
+          },
+          "priority": {
+            "description": "0 none, 1 low, 2 medium, 3 high, 4 critical",
+            "maximum": 4,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "project": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "description": "Item type key; defaults to the project's default",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project",
+          "title"
+        ],
+        "type": "object"
+      },
+      "name": "create_work_item",
+      "title": "Create work item"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Change fields of a work item. Only the fields given are changed. Status is changed with transition_work_item.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "changes": {
+            "description": "Any of: title, description, priority, assignee_id, labels, start_date, due_date, estimate, parent, cycle_id, custom",
+            "type": "object"
+          },
+          "key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "changes"
+        ],
+        "type": "object"
+      },
+      "name": "update_work_item",
+      "title": "Update work item"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Move a work item to another status. The move must be one of the transitions listed by get_work_item.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "to": {
+            "description": "Target status key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "to"
+        ],
+        "type": "object"
+      },
+      "name": "transition_work_item",
+      "title": "Transition work item"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Comment on a work item (Markdown). Set internal=true for a service desk note hidden from the customer.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "internal": {
+            "type": "boolean"
+          },
+          "key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "body"
+        ],
+        "type": "object"
+      },
+      "name": "add_comment",
+      "title": "Add comment"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create a typed link from one work item to another item or to a page (e.g. blocks, relates_to, verifies, derives_from, mitigates).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "rel": {
+            "type": "string"
+          },
+          "target_key": {
+            "description": "Key of the target item",
+            "type": "string"
+          },
+          "target_page_id": {
+            "description": "Id of the target page (instead of target_key)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "rel"
+        ],
+        "type": "object"
+      },
+      "name": "link_work_items",
+      "title": "Link work items"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "The graph of links around a work item (dependencies, traceability), up to 4 hops.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "depth": {
+            "maximum": 4,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key"
+        ],
+        "type": "object"
+      },
+      "name": "get_item_graph",
+      "title": "Get item graph"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List documentation spaces and knowledge bases you can see.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_spaces",
+      "title": "List spaces"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "A space with its page tree (ids and titles).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "space": {
+            "description": "Space key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "space"
+        ],
+        "type": "object"
+      },
+      "name": "get_space",
+      "title": "Get space"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "A page's Markdown content, version and metadata.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_page",
+      "title": "Get page"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create a documentation page (Markdown).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": "string"
+          },
+          "space": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "draft",
+              "published"
+            ],
+            "type": "string"
+          },
+          "template": {
+            "description": "Page template key to start from",
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "space",
+          "title"
+        ],
+        "type": "object"
+      },
+      "name": "create_page",
+      "title": "Create page"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Replace a page's title and/or content. base_version must be the version you read; the call fails if someone else saved in between.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "base_version": {
+            "type": "integer"
+          },
+          "content": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "message": {
+            "description": "Short note for the version history",
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "base_version"
+        ],
+        "type": "object"
+      },
+      "name": "update_page",
+      "title": "Update page"
+    }
+  ],
+  "notification_categories": [
+    {
+      "description": "A work item or request is assigned to you",
+      "email": true,
+      "in_app": true,
+      "key": "assigned",
+      "name": "Assigned to you",
+      "permission": ""
+    },
+    {
+      "description": "Someone mentions you in a discussion or a page",
+      "email": true,
+      "in_app": true,
+      "key": "mention",
+      "name": "Mentions",
+      "permission": ""
+    },
+    {
+      "description": "A new message on something you reported, are assigned to or watch",
+      "email": true,
+      "in_app": true,
+      "key": "comment",
+      "name": "New messages",
+      "permission": ""
+    },
+    {
+      "description": "Something you reported, are assigned to or watch moves to another status",
+      "email": false,
+      "in_app": true,
+      "key": "status",
+      "name": "Status changes",
+      "permission": ""
+    },
+    {
+      "description": "Fields, dates, files or links change on something you are assigned to or watch",
+      "email": false,
+      "in_app": true,
+      "key": "update",
+      "name": "Other changes",
+      "permission": ""
+    },
+    {
+      "description": "Work assigned to you is due soon or overdue",
+      "email": true,
+      "in_app": true,
+      "key": "reminder",
+      "name": "Reminders",
+      "permission": ""
+    },
+    {
+      "description": "A request is raised in a service desk you work in",
+      "email": true,
+      "in_app": true,
+      "key": "desk_new",
+      "name": "New service desk requests",
+      "permission": ""
+    },
+    {
+      "description": "A request you own misses its response or resolution target",
+      "email": true,
+      "in_app": true,
+      "key": "desk_sla",
+      "name": "Service-level warnings",
+      "permission": ""
+    },
+    {
+      "description": "New results appear in a saved search you asked to be alerted about",
+      "email": true,
+      "in_app": true,
+      "key": "search_alert",
+      "name": "Saved search alerts",
+      "permission": ""
+    },
+    {
+      "description": "You are added to or removed from a team position",
+      "email": false,
+      "in_app": true,
+      "key": "team",
+      "name": "Teams",
+      "permission": ""
+    },
+    {
+      "description": "Alerts defined by application administrators",
+      "email": true,
+      "in_app": true,
+      "key": "admin_app",
+      "name": "Application alerts",
+      "permission": "admin.access"
+    },
+    {
+      "description": "Performance, warnings, errors and component health",
+      "email": true,
+      "in_app": true,
+      "key": "admin_system",
+      "name": "System alerts",
+      "permission": "admin.settings"
+    },
+    {
+      "description": "Suspicious sign-in activity and other security events",
+      "email": true,
+      "in_app": true,
+      "key": "security",
+      "name": "Security incidents",
+      "permission": "admin.security"
+    }
+  ],
+  "permissions": [
+    {
+      "description": "Use the workspace: internal projects and spaces, the people directory",
+      "key": "workspace.access",
+      "scope": "global"
+    },
+    {
+      "description": "Create projects",
+      "key": "project.create",
+      "scope": "global"
+    },
+    {
+      "description": "Create documentation spaces",
+      "key": "space.create",
+      "scope": "global"
+    },
+    {
+      "description": "Open the administration console and see system status",
+      "key": "admin.access",
+      "scope": "global"
+    },
+    {
+      "description": "Manage users, groups and role assignments",
+      "key": "admin.users",
+      "scope": "global"
+    },
+    {
+      "description": "Define custom roles",
+      "key": "admin.roles",
+      "scope": "global"
+    },
+    {
+      "description": "Manage sign-in providers, other people's tokens, and read security events",
+      "key": "admin.security",
+      "scope": "global"
+    },
+    {
+      "description": "Read the audit log",
+      "key": "admin.audit",
+      "scope": "global"
+    },
+    {
+      "description": "Manage work item types, fields, workflows, templates and add-on packs",
+      "key": "admin.schemes",
+      "scope": "global"
+    },
+    {
+      "description": "Manage integrations and webhooks",
+      "key": "admin.integrations",
+      "scope": "global"
+    },
+    {
+      "description": "Change system settings; define system alerts",
+      "key": "admin.settings",
+      "scope": "global"
+    },
+    {
+      "description": "Create AI agent accounts, set what they may do and issue their tokens",
+      "key": "admin.agents",
+      "scope": "global"
+    },
+    {
+      "description": "Set workspace notification defaults and application alerts",
+      "key": "admin.notifications",
+      "scope": "global"
+    },
+    {
+      "description": "Provision users and groups through SCIM",
+      "key": "scim.provision",
+      "scope": "global"
+    },
+    {
+      "description": "Create teams",
+      "key": "team.create",
+      "scope": "global"
+    },
+    {
+      "description": "Edit any team, its positions and its members",
+      "key": "team.manage",
+      "scope": "global"
+    },
+    {
+      "description": "Define hierarchy levels; create programs and initiatives and assign their owners",
+      "key": "planning.manage",
+      "scope": "global"
+    },
+    {
+      "description": "Share dashboards and visualizations with the workspace",
+      "key": "analytics.share",
+      "scope": "global"
+    },
+    {
+      "description": "See the project and its work items",
+      "key": "project.view",
+      "scope": "project"
+    },
+    {
+      "description": "Change project settings, members, workflows, request types and SLAs",
+      "key": "project.admin",
+      "scope": "project"
+    },
+    {
+      "description": "See statistics and workload reports for the project",
+      "key": "project.reports",
+      "scope": "project"
+    },
+    {
+      "description": "Create work items",
+      "key": "item.create",
+      "scope": "project"
+    },
+    {
+      "description": "Edit work item fields",
+      "key": "item.edit",
+      "scope": "project"
+    },
+    {
+      "description": "Move work items through the workflow",
+      "key": "item.transition",
+      "scope": "project"
+    },
+    {
+      "description": "Assign work items",
+      "key": "item.assign",
+      "scope": "project"
+    },
+    {
+      "description": "Take part in the discussion on work items",
+      "key": "item.comment",
+      "scope": "project"
+    },
+    {
+      "description": "Remove other people's messages from a discussion",
+      "key": "comment.moderate",
+      "scope": "project"
+    },
+    {
+      "description": "Link work items to other items, pages and commits",
+      "key": "item.link",
+      "scope": "project"
+    },
+    {
+      "description": "Archive work items",
+      "key": "item.delete",
+      "scope": "project"
+    },
+    {
+      "description": "Work service desk queues; read and write internal notes",
+      "key": "desk.agent",
+      "scope": "project"
+    },
+    {
+      "description": "Raise requests through the portal and follow one's own requests",
+      "key": "desk.request",
+      "scope": "project"
+    },
+    {
+      "description": "Read pages in the space",
+      "key": "space.view",
+      "scope": "space"
+    },
+    {
+      "description": "Change space settings, members and the page workflow",
+      "key": "space.admin",
+      "scope": "space"
+    },
+    {
+      "description": "Create and edit pages",
+      "key": "page.edit",
+      "scope": "space"
+    },
+    {
+      "description": "Archive pages",
+      "key": "page.delete",
+      "scope": "space"
+    }
+  ],
+  "roles": [
+    {
+      "description": "Everything, including security and system settings.",
+      "key": "system_admin",
+      "name": "System administrator",
+      "permissions": [
+        "*"
+      ],
+      "scope": "global"
+    },
+    {
+      "description": "Runs the application day to day. Cannot change sign-in providers or system settings.",
+      "key": "app_admin",
+      "name": "Application administrator",
+      "permissions": [
+        "workspace.access",
+        "project.create",
+        "space.create",
+        "admin.access",
+        "admin.users",
+        "admin.roles",
+        "admin.schemes",
+        "admin.integrations",
+        "admin.audit",
+        "admin.agents",
+        "admin.notifications",
+        "team.create",
+        "team.manage",
+        "planning.manage",
+        "analytics.share"
+      ],
+      "scope": "global"
+    },
+    {
+      "description": "Read-only access to all content, the audit log and security events.",
+      "key": "auditor",
+      "name": "Auditor",
+      "permissions": [
+        "workspace.access",
+        "admin.access",
+        "admin.audit",
+        "admin.security",
+        "project.view",
+        "project.reports",
+        "space.view"
+      ],
+      "scope": "global"
+    },
+    {
+      "description": "Regular workspace user.",
+      "key": "member",
+      "name": "Member",
+      "permissions": [
+        "workspace.access",
+        "project.create",
+        "space.create",
+        "team.create",
+        "analytics.share"
+      ],
+      "scope": "global"
+    },
+    {
+      "description": "Portal-only account. Sees nothing until granted access to a service desk.",
+      "key": "customer",
+      "name": "Customer",
+      "permissions": [],
+      "scope": "global"
+    },
+    {
+      "description": "For identity-provider SCIM tokens only.",
+      "key": "provisioner",
+      "name": "Provisioning client",
+      "permissions": [
+        "scim.provision"
+      ],
+      "scope": "global"
+    },
+    {
+      "description": "Full control of one project.",
+      "key": "project_admin",
+      "name": "Project administrator",
+      "permissions": [
+        "project.view",
+        "project.admin",
+        "project.reports",
+        "item.create",
+        "item.edit",
+        "item.transition",
+        "item.assign",
+        "item.comment",
+        "comment.moderate",
+        "item.link",
+        "item.delete",
+        "desk.agent",
+        "desk.request"
+      ],
+      "scope": "project"
+    },
+    {
+      "description": "Does the work in a project.",
+      "key": "project_member",
+      "name": "Project member",
+      "permissions": [
+        "project.view",
+        "item.create",
+        "item.edit",
+        "item.transition",
+        "item.assign",
+        "item.comment",
+        "item.link",
+        "desk.request"
+      ],
+      "scope": "project"
+    },
+    {
+      "description": "Read-only access to one project.",
+      "key": "project_viewer",
+      "name": "Project viewer",
+      "permissions": [
+        "project.view"
+      ],
+      "scope": "project"
+    },
+    {
+      "description": "Handles requests in a service desk.",
+      "key": "service_agent",
+      "name": "Service agent",
+      "permissions": [
+        "project.view",
+        "item.create",
+        "item.edit",
+        "item.transition",
+        "item.assign",
+        "item.comment",
+        "item.link",
+        "desk.agent",
+        "desk.request"
+      ],
+      "scope": "project"
+    },
+    {
+      "description": "May raise and follow their own requests in one service desk.",
+      "key": "desk_customer",
+      "name": "Service desk customer",
+      "permissions": [
+        "desk.request"
+      ],
+      "scope": "project"
+    },
+    {
+      "description": "Full control of one space.",
+      "key": "space_admin",
+      "name": "Space administrator",
+      "permissions": [
+        "space.view",
+        "space.admin",
+        "page.edit",
+        "page.delete"
+      ],
+      "scope": "space"
+    },
+    {
+      "description": "Reads and writes pages.",
+      "key": "space_editor",
+      "name": "Space editor",
+      "permissions": [
+        "space.view",
+        "page.edit"
+      ],
+      "scope": "space"
+    },
+    {
+      "description": "Reads pages.",
+      "key": "space_viewer",
+      "name": "Space viewer",
+      "permissions": [
+        "space.view"
+      ],
+      "scope": "space"
+    }
+  ],
+  "routes": [
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "public": true,
+      "summary": "Sign in with email and password",
+      "tag": "Auth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "public": false,
+      "summary": "End the current session",
+      "tag": "Auth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/password",
+      "public": false,
+      "summary": "Change own password",
+      "tag": "Auth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tokens",
+      "public": false,
+      "summary": "List own API tokens",
+      "tag": "Tokens"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/tokens",
+      "public": false,
+      "summary": "Create an API token (shown once)",
+      "tag": "Tokens"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/tokens/{id}",
+      "public": false,
+      "summary": "Revoke an API token",
+      "tag": "Tokens"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/me",
+      "public": false,
+      "summary": "Current account, permissions, site settings and CSRF token",
+      "tag": "Auth"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/auth/me",
+      "public": false,
+      "summary": "Update own profile: name, theme, time zone, organization, job title, status",
+      "tag": "Auth"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/auth/me/avatar",
+      "public": false,
+      "summary": "Upload a profile picture (raw image body)",
+      "tag": "Auth"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/auth/me/avatar",
+      "public": false,
+      "summary": "Remove the profile picture and use a generated one (?shuffle=true for a new pattern)",
+      "tag": "Auth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/users",
+      "public": false,
+      "summary": "People and AI agents, for pickers and mentions",
+      "tag": "Directory"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/users/{id}",
+      "public": false,
+      "summary": "An account's profile and team positions",
+      "tag": "Directory"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/users/{id}/avatar",
+      "public": false,
+      "summary": "An account's picture, or its generated identicon",
+      "tag": "Directory"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/users/{id}/agent-policy",
+      "public": false,
+      "summary": "What an AI agent account is allowed to do",
+      "tag": "Admin: agents"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/admin/users/{id}/agent-policy",
+      "public": false,
+      "summary": "Set what an AI agent account is allowed to do",
+      "tag": "Admin: agents"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/providers",
+      "public": true,
+      "summary": "Sign-in options for the login page",
+      "tag": "Auth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/oidc/{id}/start",
+      "public": true,
+      "summary": "Begin single sign-on (redirects to the identity provider)",
+      "tag": "Auth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/oidc/{id}/callback",
+      "public": true,
+      "summary": "Complete single sign-on",
+      "tag": "Auth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/saml/{id}/start",
+      "public": true,
+      "summary": "Begin SAML single sign-on (redirects to the identity provider)",
+      "tag": "Auth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/saml/{id}/acs",
+      "public": true,
+      "summary": "SAML assertion consumer service: complete single sign-on",
+      "tag": "Auth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/saml/{id}/metadata",
+      "public": true,
+      "summary": "SAML service provider metadata for this sign-in provider",
+      "tag": "Auth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/auth-providers/saml-metadata",
+      "public": false,
+      "summary": "Read identity provider metadata into provider settings",
+      "tag": "Admin: security"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/teams",
+      "public": false,
+      "summary": "Teams with their leads and sizes",
+      "tag": "Teams"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/teams",
+      "public": false,
+      "summary": "Create a team; the creator becomes its first lead",
+      "tag": "Teams"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/org-chart",
+      "public": false,
+      "summary": "Every team with its positions and who fills them",
+      "tag": "Teams"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/teams/{id}",
+      "public": false,
+      "summary": "A team with its positions, members and their history",
+      "tag": "Teams"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/teams/{id}",
+      "public": false,
+      "summary": "Rename, describe, move or archive a team",
+      "tag": "Teams"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/teams/{id}/positions",
+      "public": false,
+      "summary": "Add a position to a team",
+      "tag": "Teams"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/teams/{id}/positions/{position}",
+      "public": false,
+      "summary": "Change, close or reopen a position",
+      "tag": "Teams"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/teams/{id}/positions/{position}",
+      "public": false,
+      "summary": "Remove a position (closed instead when it has history)",
+      "tag": "Teams"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/teams/{id}/positions/{position}/assignments",
+      "public": false,
+      "summary": "Put a person or an AI agent in a position",
+      "tag": "Teams"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/teams/{id}/assignments/{assignment}",
+      "public": false,
+      "summary": "Set the start date of an assignment, or end it",
+      "tag": "Teams"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/teams/{id}/assignments/{assignment}",
+      "public": false,
+      "summary": "Delete an assignment recorded by mistake",
+      "tag": "Teams"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/notifications",
+      "public": false,
+      "summary": "List own notifications",
+      "tag": "Notifications"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/notifications/read",
+      "public": false,
+      "summary": "Mark all notifications read",
+      "tag": "Notifications"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/notifications/{id}/read",
+      "public": false,
+      "summary": "Mark one notification read",
+      "tag": "Notifications"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/notifications/preferences",
+      "public": false,
+      "summary": "Own notification choices per category",
+      "tag": "Notifications"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/notifications/preferences",
+      "public": false,
+      "summary": "Choose in-app and email delivery per category",
+      "tag": "Notifications"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/alerts",
+      "public": false,
+      "summary": "Alert rules, the kinds available and recent alerts",
+      "tag": "Admin: alerts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/alerts",
+      "public": false,
+      "summary": "Create an alert rule",
+      "tag": "Admin: alerts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/admin/alerts/{id}",
+      "public": false,
+      "summary": "Change or turn off an alert rule",
+      "tag": "Admin: alerts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/admin/alerts/{id}",
+      "public": false,
+      "summary": "Delete an alert rule",
+      "tag": "Admin: alerts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/alerts/{id}/test",
+      "public": false,
+      "summary": "Measure a rule now and send a test alert through its channels",
+      "tag": "Admin: alerts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/email",
+      "public": false,
+      "summary": "Mail server settings in effect and the recent email log",
+      "tag": "Admin: email"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/email/test",
+      "public": false,
+      "summary": "Send a test email",
+      "tag": "Admin: email"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/refs/preview",
+      "public": false,
+      "summary": "Resolve the mentions and links in draft text, as the caller may see them",
+      "tag": "References"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/ws",
+      "public": false,
+      "summary": "WebSocket for live updates, presence and concurrent editing",
+      "tag": "Real time"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sandbox/frame",
+      "public": true,
+      "summary": "The empty document that custom content and visualization scripts run in",
+      "tag": "Analytics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/analytics/items",
+      "public": false,
+      "summary": "Work item counts or estimates by one to three groupings",
+      "tag": "Analytics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/analytics/summary",
+      "public": false,
+      "summary": "Key figures: open, overdue, unassigned, recently created and resolved",
+      "tag": "Analytics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/analytics/timeline",
+      "public": false,
+      "summary": "Created, resolved and open work per day, week or month",
+      "tag": "Analytics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/analytics/workload",
+      "public": false,
+      "summary": "Open and recently finished work per assignee",
+      "tag": "Analytics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/analytics/cycle-time",
+      "public": false,
+      "summary": "Days from creation to resolution for recently resolved work",
+      "tag": "Analytics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/items/query",
+      "public": false,
+      "summary": "The criteria search as a GET (?q= the search as JSON), for read-only clients",
+      "tag": "Search"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/visualizations",
+      "public": false,
+      "summary": "Saved visualizations, the built-in ones and the chart libraries",
+      "tag": "Analytics"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/visualizations",
+      "public": false,
+      "summary": "Create a visualization, from scratch or from a built-in one",
+      "tag": "Analytics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/visualization-templates/{key}",
+      "public": false,
+      "summary": "A built-in visualization with its script",
+      "tag": "Analytics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/visualizations/{id}",
+      "public": false,
+      "summary": "A visualization with its script",
+      "tag": "Analytics"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/visualizations/{id}",
+      "public": false,
+      "summary": "Change a visualization's script, parameters, sharing or editors",
+      "tag": "Analytics"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/visualizations/{id}",
+      "public": false,
+      "summary": "Delete a visualization",
+      "tag": "Analytics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboards",
+      "public": false,
+      "summary": "Dashboards: own, editable and shared",
+      "tag": "Analytics"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/dashboards",
+      "public": false,
+      "summary": "Create a dashboard",
+      "tag": "Analytics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboards/{id}",
+      "public": false,
+      "summary": "A dashboard with its tiles and their scripts",
+      "tag": "Analytics"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/dashboards/{id}",
+      "public": false,
+      "summary": "Change a dashboard's name, layout, parameters, sharing or editors",
+      "tag": "Analytics"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/dashboards/{id}",
+      "public": false,
+      "summary": "Delete a dashboard",
+      "tag": "Analytics"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/dashboards/{id}/tiles/{tile}",
+      "public": false,
+      "summary": "Add or change one tile",
+      "tag": "Analytics"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/dashboards/{id}/tiles/{tile}",
+      "public": false,
+      "summary": "Remove one tile",
+      "tag": "Analytics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/hierarchy",
+      "public": false,
+      "summary": "The levels above projects and the levels of work item types",
+      "tag": "Planning"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/hierarchy/levels",
+      "public": false,
+      "summary": "Define the levels of one kind, from the top",
+      "tag": "Planning"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/hierarchy/item-types/{key}",
+      "public": false,
+      "summary": "Put a work item type on a level",
+      "tag": "Planning"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/containers",
+      "public": false,
+      "summary": "Programs and initiatives with the projects in them",
+      "tag": "Planning"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/containers",
+      "public": false,
+      "summary": "Create a program, an initiative or whatever the level is called",
+      "tag": "Planning"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/containers/{id}",
+      "public": false,
+      "summary": "One container with what it holds",
+      "tag": "Planning"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/containers/{id}",
+      "public": false,
+      "summary": "Update, move, hand over or archive a container",
+      "tag": "Planning"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/projects/{key}/container",
+      "public": false,
+      "summary": "Place a project in a container, or take it out",
+      "tag": "Planning"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/reports/project/{key}",
+      "public": false,
+      "summary": "Statistics and workload for a project",
+      "tag": "Reports"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/reports/container/{id}",
+      "public": false,
+      "summary": "Statistics and workload across everything under a container",
+      "tag": "Reports"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/items/query",
+      "public": false,
+      "summary": "Find work items by any combination of fields, including custom ones",
+      "tag": "Search"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/items/query/fields",
+      "public": false,
+      "summary": "The fields, operators and values a search can use",
+      "tag": "Search"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/searches",
+      "public": false,
+      "summary": "Saved searches: own and shared",
+      "tag": "Search"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/searches",
+      "public": false,
+      "summary": "Save a search",
+      "tag": "Search"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/searches/{id}",
+      "public": false,
+      "summary": "Rename, change, share or set alerts on a saved search",
+      "tag": "Search"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/searches/{id}",
+      "public": false,
+      "summary": "Delete a saved search",
+      "tag": "Search"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/gantt",
+      "public": false,
+      "summary": "Saved Gantt charts: own and shared",
+      "tag": "Gantt"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/gantt",
+      "public": false,
+      "summary": "Save a Gantt chart",
+      "tag": "Gantt"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/gantt/data",
+      "public": false,
+      "summary": "Dated work for a project or container (?project= or ?container=)",
+      "tag": "Gantt"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/gantt/{id}",
+      "public": false,
+      "summary": "A saved chart with its work items and annotations",
+      "tag": "Gantt"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/gantt/{id}",
+      "public": false,
+      "summary": "Change a chart's name, scope, annotations, settings or sharing",
+      "tag": "Gantt"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/gantt/{id}",
+      "public": false,
+      "summary": "Delete a chart",
+      "tag": "Gantt"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/graph/hierarchy",
+      "public": false,
+      "summary": "The hierarchy as a graph: containers, projects and work items",
+      "tag": "Planning"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/about",
+      "public": true,
+      "summary": "Privacy, terms, cookie, retention and security statements, and how to reach support",
+      "tag": "About"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/about/components",
+      "public": false,
+      "summary": "Installed components and add-ons with versions, dates and descriptions",
+      "tag": "About"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/about/status-codes",
+      "public": true,
+      "summary": "What each response code means for a person, what they can do, and how to reach support",
+      "tag": "About"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/catalog",
+      "public": false,
+      "summary": "Roles, groups and work item types for pickers",
+      "tag": "Projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/projects",
+      "public": false,
+      "summary": "List projects visible to the caller",
+      "tag": "Projects"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/projects",
+      "public": false,
+      "summary": "Create a project from a template",
+      "tag": "Projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/project-templates",
+      "public": false,
+      "summary": "List project templates",
+      "tag": "Projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/projects/{key}",
+      "public": false,
+      "summary": "Project with types, workflows, members and counts",
+      "tag": "Projects"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/projects/{key}",
+      "public": false,
+      "summary": "Update project settings",
+      "tag": "Projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/projects/{key}/people",
+      "public": false,
+      "summary": "Accounts that can open the project (assignee and mention choices)",
+      "tag": "Projects"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/projects/{key}/workflows/{type}",
+      "public": false,
+      "summary": "Give a work item type its own workflow in this project, or return to the shared one",
+      "tag": "Projects"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/projects/{key}/members",
+      "public": false,
+      "summary": "Grant a project role to a user or group",
+      "tag": "Projects"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/projects/{key}/members/{binding}",
+      "public": false,
+      "summary": "Remove a project role grant",
+      "tag": "Projects"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/projects/{key}/cycles",
+      "public": false,
+      "summary": "Create a cycle (sprint, iteration)",
+      "tag": "Projects"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/projects/{key}/cycles/{id}",
+      "public": false,
+      "summary": "Update a cycle",
+      "tag": "Projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/items",
+      "public": false,
+      "summary": "List and filter work items across visible projects",
+      "tag": "Work items"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/projects/{key}/items",
+      "public": false,
+      "summary": "Create a work item",
+      "tag": "Work items"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/items/{key}",
+      "public": false,
+      "summary": "Work item with comments, links, history and allowed transitions",
+      "tag": "Work items"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/items/{key}",
+      "public": false,
+      "summary": "Update fields of a work item",
+      "tag": "Work items"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/items/{key}",
+      "public": false,
+      "summary": "Archive a work item",
+      "tag": "Work items"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/items/{key}/transition",
+      "public": false,
+      "summary": "Move a work item to another status",
+      "tag": "Work items"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/items/{key}/comments",
+      "public": false,
+      "summary": "The discussion on a work item",
+      "tag": "Discussion"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/items/{key}/comments",
+      "public": false,
+      "summary": "Post a message (optionally an internal note)",
+      "tag": "Discussion"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/comments/{id}",
+      "public": false,
+      "summary": "Edit one's own message",
+      "tag": "Discussion"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/comments/{id}",
+      "public": false,
+      "summary": "Remove a message (one's own, or any with the moderation permission)",
+      "tag": "Discussion"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/items/{key}/history",
+      "public": false,
+      "summary": "Every change to a work item: field, old and new value, who and when",
+      "tag": "Work items"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/items/{key}/watch",
+      "public": false,
+      "summary": "Follow a work item",
+      "tag": "Work items"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/items/{key}/watch",
+      "public": false,
+      "summary": "Stop following a work item",
+      "tag": "Work items"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/items/{key}/links",
+      "public": false,
+      "summary": "Link a work item to an item or page",
+      "tag": "Work items"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/links/{id}",
+      "public": false,
+      "summary": "Remove a link",
+      "tag": "Work items"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/items/{key}/graph",
+      "public": false,
+      "summary": "Dependency and traceability graph around an item",
+      "tag": "Work items"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/items/{key}/attachments",
+      "public": false,
+      "summary": "Upload a file (raw body, ?filename=)",
+      "tag": "Attachments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/attachments/{id}",
+      "public": false,
+      "summary": "Download a file",
+      "tag": "Attachments"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/attachments/{id}",
+      "public": false,
+      "summary": "Delete a file",
+      "tag": "Attachments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/projects/{key}/queues",
+      "public": false,
+      "summary": "Agent queues with counts and the item filter for each",
+      "tag": "Service desk"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/projects/{key}/request-types",
+      "public": false,
+      "summary": "List request types",
+      "tag": "Service desk"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/projects/{key}/request-types",
+      "public": false,
+      "summary": "Create a request type",
+      "tag": "Service desk"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/projects/{key}/request-types/{id}",
+      "public": false,
+      "summary": "Update a request type",
+      "tag": "Service desk"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/projects/{key}/request-types/{id}",
+      "public": false,
+      "summary": "Delete a request type",
+      "tag": "Service desk"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/projects/{key}/sla",
+      "public": false,
+      "summary": "Service-level targets and working calendar",
+      "tag": "Service desk"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/projects/{key}/sla",
+      "public": false,
+      "summary": "Replace service-level targets",
+      "tag": "Service desk"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/portal/desks",
+      "public": false,
+      "summary": "Service desks the caller may raise requests in",
+      "tag": "Portal"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/portal/desks/{key}",
+      "public": false,
+      "summary": "A desk's request types and forms",
+      "tag": "Portal"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/portal/desks/{key}/requests",
+      "public": false,
+      "summary": "Raise a request",
+      "tag": "Portal"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/portal/desks/{key}/suggest",
+      "public": false,
+      "summary": "Suggest knowledge base articles for a question",
+      "tag": "Portal"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/portal/desks/{key}/articles",
+      "public": false,
+      "summary": "List customer-visible knowledge base articles",
+      "tag": "Portal"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/portal/desks/{key}/articles/{id}",
+      "public": false,
+      "summary": "Read a customer-visible article",
+      "tag": "Portal"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/portal/requests",
+      "public": false,
+      "summary": "The caller's own requests",
+      "tag": "Portal"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/portal/requests/{key}",
+      "public": false,
+      "summary": "One of the caller's requests, without internal notes",
+      "tag": "Portal"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/portal/requests/{key}/comments",
+      "public": false,
+      "summary": "Reply on one's own request",
+      "tag": "Portal"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/portal/requests/{key}/attachments",
+      "public": false,
+      "summary": "Attach a file to one's own request",
+      "tag": "Portal"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/spaces",
+      "public": false,
+      "summary": "List documentation spaces visible to the caller",
+      "tag": "Docs"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/spaces",
+      "public": false,
+      "summary": "Create a space",
+      "tag": "Docs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/spaces/{key}",
+      "public": false,
+      "summary": "Space with its page tree",
+      "tag": "Docs"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/spaces/{key}",
+      "public": false,
+      "summary": "Update space settings",
+      "tag": "Docs"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/spaces/{key}/members",
+      "public": false,
+      "summary": "Grant a space role to a user or group",
+      "tag": "Docs"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/spaces/{key}/members/{binding}",
+      "public": false,
+      "summary": "Remove a space role grant",
+      "tag": "Docs"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/spaces/{key}/pages",
+      "public": false,
+      "summary": "Create a page, optionally from a template",
+      "tag": "Docs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/pages/{id}",
+      "public": false,
+      "summary": "Page content and metadata",
+      "tag": "Docs"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/pages/{id}",
+      "public": false,
+      "summary": "Save a page (creates a version when title or content change)",
+      "tag": "Docs"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/pages/{id}",
+      "public": false,
+      "summary": "Archive a page and its children",
+      "tag": "Docs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/pages/{id}/versions",
+      "public": false,
+      "summary": "Version history",
+      "tag": "Docs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/pages/{id}/versions/{version}",
+      "public": false,
+      "summary": "One historical version",
+      "tag": "Docs"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/pages/{id}/versions/{version}/restore",
+      "public": false,
+      "summary": "Restore a historical version as the newest",
+      "tag": "Docs"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/pages/{id}/attachments",
+      "public": false,
+      "summary": "Upload a file to a page (raw body, ?filename=)",
+      "tag": "Attachments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/page-templates",
+      "public": false,
+      "summary": "List page templates",
+      "tag": "Docs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/page-templates/{key}",
+      "public": false,
+      "summary": "A page template with its body",
+      "tag": "Docs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/search",
+      "public": false,
+      "summary": "Search work items and pages the caller may see",
+      "tag": "Search"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/overview",
+      "public": false,
+      "summary": "System status: counts, components and their health",
+      "tag": "Admin"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/jobs",
+      "public": false,
+      "summary": "Background jobs: queued, running, failed and recent",
+      "tag": "Admin"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/jobs/{id}/retry",
+      "public": false,
+      "summary": "Retry a failed job",
+      "tag": "Admin"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/users",
+      "public": false,
+      "summary": "List users and agents",
+      "tag": "Admin: users"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/users",
+      "public": false,
+      "summary": "Create a user or an agent account",
+      "tag": "Admin: users"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/admin/users/{id}",
+      "public": false,
+      "summary": "Update an account: name, email, organization, job title, handle, time zone, active, unlock, password, picture",
+      "tag": "Admin: users"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/users/{id}/sessions/revoke",
+      "public": false,
+      "summary": "Sign a user out everywhere",
+      "tag": "Admin: users"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/users/{id}/roles",
+      "public": false,
+      "summary": "Grant a global role",
+      "tag": "Admin: users"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/admin/users/{id}/roles/{role}",
+      "public": false,
+      "summary": "Revoke a global role",
+      "tag": "Admin: users"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/users/{id}/tokens",
+      "public": false,
+      "summary": "List a user's API tokens",
+      "tag": "Admin: users"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/users/{id}/tokens",
+      "public": false,
+      "summary": "Create an API token for an AI agent",
+      "tag": "Admin: users"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/groups",
+      "public": false,
+      "summary": "List groups with members and roles",
+      "tag": "Admin: groups"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/groups",
+      "public": false,
+      "summary": "Create a group",
+      "tag": "Admin: groups"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/admin/groups/{id}",
+      "public": false,
+      "summary": "Delete a group",
+      "tag": "Admin: groups"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/groups/{id}/members",
+      "public": false,
+      "summary": "Add a member",
+      "tag": "Admin: groups"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/admin/groups/{id}/members/{user}",
+      "public": false,
+      "summary": "Remove a member",
+      "tag": "Admin: groups"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/groups/{id}/roles",
+      "public": false,
+      "summary": "Grant a global role to a group",
+      "tag": "Admin: groups"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/admin/groups/{id}/roles/{role}",
+      "public": false,
+      "summary": "Revoke a global role from a group",
+      "tag": "Admin: groups"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/roles",
+      "public": false,
+      "summary": "List roles and the permission catalog",
+      "tag": "Admin: roles"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/roles",
+      "public": false,
+      "summary": "Create a custom role",
+      "tag": "Admin: roles"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/admin/roles/{key}",
+      "public": false,
+      "summary": "Update a custom role",
+      "tag": "Admin: roles"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/admin/roles/{key}",
+      "public": false,
+      "summary": "Delete a custom role",
+      "tag": "Admin: roles"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/auth-providers",
+      "public": false,
+      "summary": "List single sign-on providers",
+      "tag": "Admin: security"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/auth-providers",
+      "public": false,
+      "summary": "Add a single sign-on provider",
+      "tag": "Admin: security"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/admin/auth-providers/{id}",
+      "public": false,
+      "summary": "Update a single sign-on provider",
+      "tag": "Admin: security"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/admin/auth-providers/{id}",
+      "public": false,
+      "summary": "Remove a single sign-on provider",
+      "tag": "Admin: security"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/audit",
+      "public": false,
+      "summary": "Search the audit log",
+      "tag": "Admin: audit"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/audit/verify",
+      "public": false,
+      "summary": "Verify the audit log hash chain",
+      "tag": "Admin: audit"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/security-events",
+      "public": false,
+      "summary": "Security events with a 24-hour summary",
+      "tag": "Admin: security"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/schemes",
+      "public": false,
+      "summary": "Fields, workflows and work item types",
+      "tag": "Admin: schemes"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/admin/fields/{key}",
+      "public": false,
+      "summary": "Create or update a custom field",
+      "tag": "Admin: schemes"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/admin/workflows/{key}",
+      "public": false,
+      "summary": "Create or update a workflow",
+      "tag": "Admin: schemes"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/admin/item-types/{key}",
+      "public": false,
+      "summary": "Create or update a work item type",
+      "tag": "Admin: schemes"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/projects/{key}/types",
+      "public": false,
+      "summary": "Choose the work item types a project uses",
+      "tag": "Projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/packs",
+      "public": false,
+      "summary": "Installed and available add-on packs",
+      "tag": "Admin: schemes"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/packs/{id}/install",
+      "public": false,
+      "summary": "Install or update an add-on pack",
+      "tag": "Admin: schemes"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/settings",
+      "public": false,
+      "summary": "Stored settings the caller may change, and the effective configuration (secrets omitted)",
+      "tag": "Admin: settings"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/admin/settings/{key}",
+      "public": false,
+      "summary": "Change a stored setting: site, legal, profile, notifications, hierarchy",
+      "tag": "Admin: settings"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/integrations",
+      "public": false,
+      "summary": "List integrations, available kinds and event types",
+      "tag": "Integrations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/integrations",
+      "public": false,
+      "summary": "Create an integration",
+      "tag": "Integrations"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/admin/integrations/{id}",
+      "public": false,
+      "summary": "Update an integration",
+      "tag": "Integrations"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/admin/integrations/{id}",
+      "public": false,
+      "summary": "Delete an integration",
+      "tag": "Integrations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/integrations/{id}/test",
+      "public": false,
+      "summary": "Send a test message",
+      "tag": "Integrations"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/integrations/{id}/deliveries",
+      "public": false,
+      "summary": "Recent deliveries",
+      "tag": "Integrations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/integrations/{id}/jira-import",
+      "public": false,
+      "summary": "Start a Jira import",
+      "tag": "Integrations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/hooks/github/{id}",
+      "public": true,
+      "summary": "GitHub webhook receiver (signature required)",
+      "tag": "Webhooks"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/hooks/gitlab/{id}",
+      "public": true,
+      "summary": "GitLab webhook receiver (signature required)",
+      "tag": "Webhooks"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/hooks/slack/{id}/command",
+      "public": true,
+      "summary": "Slack slash command receiver (signature required)",
+      "tag": "Webhooks"
+    },
+    {
+      "method": "GET",
+      "path": "/scim/v2/ServiceProviderConfig",
+      "public": false,
+      "summary": "SCIM capabilities",
+      "tag": "SCIM"
+    },
+    {
+      "method": "GET",
+      "path": "/scim/v2/Users",
+      "public": false,
+      "summary": "List or look up users",
+      "tag": "SCIM"
+    },
+    {
+      "method": "POST",
+      "path": "/scim/v2/Users",
+      "public": false,
+      "summary": "Provision a user",
+      "tag": "SCIM"
+    },
+    {
+      "method": "GET",
+      "path": "/scim/v2/Users/{id}",
+      "public": false,
+      "summary": "Read a user",
+      "tag": "SCIM"
+    },
+    {
+      "method": "PUT",
+      "path": "/scim/v2/Users/{id}",
+      "public": false,
+      "summary": "Replace a user",
+      "tag": "SCIM"
+    },
+    {
+      "method": "PATCH",
+      "path": "/scim/v2/Users/{id}",
+      "public": false,
+      "summary": "Update a user (for example deactivate)",
+      "tag": "SCIM"
+    },
+    {
+      "method": "DELETE",
+      "path": "/scim/v2/Users/{id}",
+      "public": false,
+      "summary": "Deactivate a user",
+      "tag": "SCIM"
+    },
+    {
+      "method": "GET",
+      "path": "/scim/v2/Groups",
+      "public": false,
+      "summary": "List or look up groups",
+      "tag": "SCIM"
+    },
+    {
+      "method": "POST",
+      "path": "/scim/v2/Groups",
+      "public": false,
+      "summary": "Create a group",
+      "tag": "SCIM"
+    },
+    {
+      "method": "GET",
+      "path": "/scim/v2/Groups/{id}",
+      "public": false,
+      "summary": "Read a group",
+      "tag": "SCIM"
+    },
+    {
+      "method": "PUT",
+      "path": "/scim/v2/Groups/{id}",
+      "public": false,
+      "summary": "Replace a group",
+      "tag": "SCIM"
+    },
+    {
+      "method": "PATCH",
+      "path": "/scim/v2/Groups/{id}",
+      "public": false,
+      "summary": "Change group membership or name",
+      "tag": "SCIM"
+    },
+    {
+      "method": "DELETE",
+      "path": "/scim/v2/Groups/{id}",
+      "public": false,
+      "summary": "Delete a group",
+      "tag": "SCIM"
+    },
+    {
+      "method": "POST",
+      "path": "/mcp",
+      "public": false,
+      "summary": "Model Context Protocol endpoint (JSON-RPC over Streamable HTTP)",
+      "tag": "MCP"
+    }
+  ],
+  "status_texts": [
+    {
+      "action": "Go back and try again. If you followed a link, it may have been cut short when it was copied.",
+      "code": 400,
+      "meaning": "The address or the information sent with it was not in a form the server accepts.",
+      "title": "The request could not be understood"
+    },
+    {
+      "action": "Sign in, then open the link again.",
+      "code": 401,
+      "meaning": "This needs a signed-in account, and you are not signed in or your session has ended.",
+      "title": "You need to sign in"
+    },
+    {
+      "action": "If you think you should have access, ask the owner of the project or space, or an administrator, to add you.",
+      "code": 403,
+      "meaning": "You are signed in, but your account is not allowed to see or do this.",
+      "title": "You do not have access to this"
+    },
+    {
+      "action": "Check the address, use search, or ask the person who sent you the link.",
+      "code": 404,
+      "meaning": "Nothing is at this address for your account. It may have been moved, archived or deleted, or it may be in a project or space you are not a member of.",
+      "title": "This does not exist, or you cannot see it"
+    },
+    {
+      "action": "Go back and use the buttons and links in the application.",
+      "code": 405,
+      "meaning": "The address exists but does not support what was asked of it.",
+      "title": "That is not possible at this address"
+    },
+    {
+      "action": "Check your connection and try again.",
+      "code": 408,
+      "meaning": "The server stopped waiting because the request did not arrive in time, usually because of a slow or interrupted connection.",
+      "title": "The request took too long to arrive"
+    },
+    {
+      "action": "Reload to see the current state, then make your change again.",
+      "code": 409,
+      "meaning": "Someone else changed the same thing first, or the change conflicts with something that already exists.",
+      "title": "This changed while you were working on it"
+    },
+    {
+      "action": "Ask the person who sent you the link whether there is a replacement.",
+      "code": 410,
+      "meaning": "It existed once and has been removed for good.",
+      "title": "This is no longer available"
+    },
+    {
+      "action": "Send a smaller file, or split it. An administrator can tell you the limit.",
+      "code": 413,
+      "meaning": "The file or the text you sent is larger than this installation accepts.",
+      "title": "That is too large"
+    },
+    {
+      "action": "Check the file type and try again.",
+      "code": 415,
+      "meaning": "The server does not accept this type of file or data at this address.",
+      "title": "That kind of content is not accepted here"
+    },
+    {
+      "action": "Go back, correct the highlighted fields, and try again.",
+      "code": 422,
+      "meaning": "The request was understood, but a value in it is missing or not allowed.",
+      "title": "Something in the request is not valid"
+    },
+    {
+      "action": "Wait a minute, then try again.",
+      "code": 429,
+      "meaning": "Too much was asked of the server in a short time from your account or your network, so it is briefly refusing more.",
+      "title": "Too many requests"
+    },
+    {
+      "action": "Try again in a moment. If it keeps happening, tell support and include the reference below.",
+      "code": 500,
+      "meaning": "The server ran into a problem it did not expect. It was recorded. Nothing you did caused it.",
+      "title": "Something went wrong on the server"
+    },
+    {
+      "action": "Ask an administrator whether it can be turned on.",
+      "code": 501,
+      "meaning": "This installation does not have the feature this address needs.",
+      "title": "This is not set up"
+    },
+    {
+      "action": "Wait a minute and reload. If it lasts, tell support.",
+      "code": 502,
+      "meaning": "The server in front of the application could not reach it. It may be restarting or being upgraded.",
+      "title": "The application is not answering"
+    },
+    {
+      "action": "Wait a few minutes and reload. If it lasts, tell support.",
+      "code": 503,
+      "meaning": "The application is running but cannot serve requests right now, for example during maintenance or because the database is unreachable.",
+      "title": "Temporarily unavailable"
+    },
+    {
+      "action": "Try again. If you were asking for something large, narrow it down.",
+      "code": 504,
+      "meaning": "The server in front of the application gave up waiting for an answer.",
+      "title": "The application took too long to answer"
+    }
+  ],
+  "version": "0.2.0",
+  "visualizations": {
+    "libraries": [
+      {
+        "key": "chartjs",
+        "name": "Chart.js"
+      },
+      {
+        "key": "echarts",
+        "name": "Apache ECharts"
+      },
+      {
+        "key": "plotly",
+        "name": "Plotly"
+      },
+      {
+        "key": "d3",
+        "name": "D3"
+      },
+      {
+        "key": "html",
+        "name": "HTML and script (no library)"
+      }
+    ],
+    "templates": [
+      {
+        "description": "Open, overdue, unassigned and recently resolved work as four numbers.",
+        "key": "kpi-tiles",
+        "library": "html",
+        "name": "Key figures"
+      },
+      {
+        "description": "To do, in progress and done as a doughnut.",
+        "key": "status-donut",
+        "library": "chartjs",
+        "name": "Work by status"
+      },
+      {
+        "description": "Work created and resolved per week, side by side.",
+        "key": "throughput-bars",
+        "library": "chartjs",
+        "name": "Created and resolved"
+      },
+      {
+        "description": "How much was unfinished at the end of each week.",
+        "key": "open-line",
+        "library": "chartjs",
+        "name": "Open work over time"
+      },
+      {
+        "description": "Horizontal bars from none to critical.",
+        "key": "priority-bars",
+        "library": "echarts",
+        "name": "Open work by priority"
+      },
+      {
+        "description": "A treemap of work item types by count.",
+        "key": "type-treemap",
+        "library": "echarts",
+        "name": "Work by type"
+      },
+      {
+        "description": "Open work per person or AI agent, split by status, with overdue alongside.",
+        "key": "workload-stacked",
+        "library": "echarts",
+        "name": "Workload by assignee"
+      },
+      {
+        "description": "Work created per day as a calendar heat map.",
+        "key": "activity-calendar",
+        "library": "echarts",
+        "name": "Activity calendar"
+      },
+      {
+        "description": "Days from creation to resolution for each resolved item, with the median and the 85th percentile.",
+        "key": "cycle-scatter",
+        "library": "plotly",
+        "name": "Time to resolve"
+      },
+      {
+        "description": "Labels as bubbles sized by the open work that carries them.",
+        "key": "label-bubbles",
+        "library": "d3",
+        "name": "Labels"
+      },
+      {
+        "description": "Nested rings: project, then type, then status.",
+        "key": "status-sunburst",
+        "library": "d3",
+        "name": "Projects, types and status"
+      },
+      {
+        "description": "The open work with the nearest due dates, as a table.",
+        "key": "due-table",
+        "library": "html",
+        "name": "Due next"
+      }
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+# /etc/gantry/gantry.toml on every application node of a multi-node installation.
+# Every node must also have the SAME /etc/gantry/secret.key.
+
+[server]
+bind = "0.0.0.0:8600"                      # reached by the load balancer, not by users
+public_url = "https://gantry.example.org"
+trusted_proxies = ["10.0.0.10"]            # the load balancer(s)
+
+[database]
+url = "postgres://gantry:CHANGE-ME@db.internal:5432/gantry?sslmode=verify-full"
+max_connections = 20                       # per process; keep the total under PostgreSQL's limit
+
+[security]
+secret_key_file = "/etc/gantry/secret.key"
+
+[storage.blob]                             # attachments must be shared between nodes
+backend = "s3"
+endpoint = "https://objects.internal"
+bucket = "gantry"
+region = "us-east-1"
+access_key = "CHANGE-ME"
+secret_key = "CHANGE-ME"
+
+[storage.kv]                               # optional: shared counters in Valkey
+backend = "valkey"
+url = "valkey://:CHANGE-ME@valkey.internal:6379"
+
+[worker]
+embedded = false                           # background jobs run on the worker nodes

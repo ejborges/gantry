@@ -1,0 +1,25 @@
+<!-- Open work that is due soonest. Plain HTML with a script; no chart library. -->
+<style>
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--grid); }
+  th { color: var(--muted); font-weight: 600; position: sticky; top: 0; background: var(--background); }
+  td.late { color: var(--danger); font-weight: 600; }
+  .wrap { height: 100%; overflow: auto; }
+</style>
+<div class="wrap"><table><thead><tr><th scope="col">Key</th><th scope="col">Name</th><th scope="col">Assignee</th><th scope="col">Due</th></tr></thead><tbody id="rows"></tbody></table></div>
+<script>
+  const criteria = [{ field: 'status_category', op: 'not_in', value: ['done'] }, { field: 'due', op: 'is_not_empty' }];
+  if (gantry.params.project) criteria.push({ field: 'project', op: 'in', value: [gantry.params.project] });
+  const res = await gantry.api.get('/api/v1/items/query', { q: JSON.stringify({ criteria, sort: [{ field: 'due', dir: 'asc' }], limit: gantry.params.rows || 15 }) });
+  const today = new Date().toISOString().slice(0, 10);
+  const body = document.getElementById('rows');
+  for (const item of res.items) {
+    const tr = body.appendChild(document.createElement('tr'));
+    const cell = (text, cls) => { const td = tr.appendChild(document.createElement('td')); td.textContent = text; if (cls) td.className = cls; return td; };
+    cell(item.key);
+    cell(item.title);
+    cell(item.assignee ? item.assignee.name + (item.assignee.kind === 'agent' ? ' (AI agent)' : '') : '—');
+    cell((item.due_date < today ? 'Overdue since ' : '') + gantry.formatDate(item.due_date, { dateStyle: 'medium' }), item.due_date < today ? 'late' : '');
+  }
+  if (!res.items.length) body.appendChild(document.createElement('tr')).appendChild(document.createElement('td')).textContent = 'Nothing with a due date is open.';
+</script>

@@ -1,0 +1,25 @@
+# Podman Quadlet unit: systemd generates gantry-objectstore.service from this file.
+# SeaweedFS (Apache-2.0) providing an S3-compatible store for attachments on loopback.
+# Credentials are created by gantry-objectstore-setup and kept in /etc/gantry/objectstore.
+[Unit]
+Description=S3-compatible object store for Gantry (SeaweedFS, loopback only)
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=/etc/gantry/objectstore/s3.json
+
+[Container]
+ContainerName=gantry-objectstore
+Image=docker.io/chrislusf/seaweedfs:latest
+AutoUpdate=registry
+PublishPort=127.0.0.1:8333:8333
+Volume=gantry-objectstore-data:/data:Z
+Volume=/etc/gantry/objectstore/s3.json:/etc/seaweedfs/s3.json:ro,Z
+Exec=server -dir=/data -ip.bind=0.0.0.0 -volume.max=0 -master.volumeSizeLimitMB=1024 -s3 -s3.port=8333 -s3.config=/etc/seaweedfs/s3.json
+NoNewPrivileges=true
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=600
+
+[Install]
+WantedBy=multi-user.target

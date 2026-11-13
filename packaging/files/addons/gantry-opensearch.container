@@ -1,0 +1,32 @@
+# Podman Quadlet unit: systemd generates gantry-opensearch.service from this file.
+# One OpenSearch node for one Gantry server. It listens on loopback only, which is why
+# its own security plugin is off; a cluster reachable over the network must use TLS and
+# accounts instead (see the manual: System administration, Storage back ends).
+[Unit]
+Description=OpenSearch for Gantry (single node, loopback only)
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+ContainerName=gantry-opensearch
+Image=docker.io/opensearchproject/opensearch:2
+AutoUpdate=registry
+PublishPort=127.0.0.1:9200:9200
+Volume=gantry-opensearch-data:/usr/share/opensearch/data:Z
+Environment=discovery.type=single-node
+Environment=DISABLE_SECURITY_PLUGIN=true
+Environment=DISABLE_INSTALL_DEMO_CONFIG=true
+Environment=OPENSEARCH_JAVA_OPTS=-Xms1g\ -Xmx1g
+Ulimit=nofile=65536:65536
+Ulimit=memlock=-1:-1
+HealthCmd=curl -fsS http://127.0.0.1:9200/_cluster/health
+HealthInterval=30s
+HealthStartPeriod=90s
+NoNewPrivileges=true
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target

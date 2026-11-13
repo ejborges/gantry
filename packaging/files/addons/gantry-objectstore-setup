@@ -1,0 +1,43 @@
+#!/usr/bin/bash
+# Create credentials for the local object store, start it, create the bucket and point
+# Gantry at it. Run once after installing gantry-addon-objectstore. Running it again
+# keeps the existing credentials.
+#
+# Existing attachments are not moved: copy /var/lib/gantry/blobs into the bucket first
+# if this server already holds files (see the manual: System administration, Storage back ends).
+set -euo pipefail
+[ "$(id -u)" = 0 ] || { echo "run as root" >&2; exit 1; }
+DIR=/etc/gantry/objectstore
+DROPIN=/etc/gantry/conf.d/50-objectstore.toml
+BUCKET=gantry
+umask 027
+mkdir -p "$DIR"
+if [ ! -s "$DIR/s3.json" ]; then
+  ACCESS="gantry$(openssl rand -hex 6)"
+  SECRET="$(openssl rand -hex 24)"
+  cat > "$DIR/s3.json" <<JSON
+{"identities": [{"name": "gantry", "credentials": [{"accessKey": "$ACCESS", "secretKey": "$SECRET"}], "actions": ["Admin", "Read", "Write", "List", "Tagging"]}]}
+JSON
+  cat > "$DROPIN" <<TOML
+# Written by gantry-objectstore-setup. Attachments are kept in the local S3-compatible store.
+[storage.blob]
+backend = "s3"
+endpoint = "http://127.0.0.1:8333"
+bucket = "$BUCKET"
+region = "us-east-1"
+access_key = "$ACCESS"
+secret_key = "$SECRET"
+TOML
+  chown root:gantry "$DROPIN"; chmod 0640 "$DROPIN"
+  echo "created credentials in $DIR/s3.json and $DROPIN"
+fi
+chmod 0750 "$DIR"; chmod 0640 "$DIR/s3.json"
+systemctl daemon-reload
+systemctl enable --now gantry-objectstore.service 2>/dev/null || systemctl start gantry-objectstore.service
+echo "waiting for the object store"
+for _ in $(seq 1 90); do curl -fsS -o /dev/null http://127.0.0.1:8333/ 2>/dev/null && break; curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8333/ 2>/dev/null | grep -Eq '^(200|403)$' && break; sleep 2; done
+echo "s3.bucket.create -name $BUCKET" | podman exec -i gantry-objectstore weed shell >/dev/null 2>&1 || true
+echo "s3.bucket.list" | podman exec -i gantry-objectstore weed shell 2>/dev/null | grep -q "$BUCKET" || { echo "could not confirm bucket $BUCKET; see: journalctl -u gantry-objectstore" >&2; exit 1; }
+systemctl try-restart gantry.service
+runuser -u gantry -- /usr/bin/gantry doctor | grep -i -E "files|blob" || true
+echo "done. New attachments are stored in bucket $BUCKET."

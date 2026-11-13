@@ -1,0 +1,54 @@
+#!/usr/bin/bash
+# Back up everything needed to rebuild this Gantry node: the database, the attachment
+# store (when it is on local disk) and /etc/gantry including the secret key.
+#
+#   gantry-backup [directory]        default /var/backups/gantry
+#   GANTRY_BACKUP_KEEP=14            how many backups to keep (0 keeps all)
+#
+# Each run writes a new directory named by UTC time. The backup contains the secret
+# key, so the directory is readable by root only; keep copies somewhere equally private.
+set -euo pipefail
+
+[ "$(id -u)" = 0 ] || { echo "gantry-backup must run as root" >&2; exit 1; }
+ROOT="${1:-/var/backups/gantry}"
+KEEP="${GANTRY_BACKUP_KEEP:-14}"
+STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+DEST="$ROOT/$STAMP"
+umask 077
+mkdir -p "$DEST"
+# shellcheck disable=SC2154  # rc is assigned inside the trap itself
+trap 'rc=$?; [ $rc -eq 0 ] || { echo "backup failed; removing incomplete $DEST" >&2; rm -rf "$DEST"; }; exit $rc' EXIT
+
+# Settings come from the same configuration the server uses.
+CONFIG="$(runuser -u gantry -- /usr/bin/gantry config check)" || { echo "the configuration is not valid; fix it before backing up" >&2; exit 1; }
+value() { printf '%s\n' "$CONFIG" | awk -v section="[$1]" -v key="$2" '$0 == section {on=1; next} /^\[/ {on=0} on && $1 == key {sub(/^[^=]*= */, ""); gsub(/^"|"$/, ""); print; exit}'; }
+BLOB_BACKEND="$(value storage.blob backend)"
+BLOB_PATH="$(value storage.blob path)"
+# A password in the database address is never printed, so a remote database with one needs
+# GANTRY_BACKUP_DATABASE_URL (or a ~gantry/.pgpass entry and an address without the password).
+DB_URL="${GANTRY_BACKUP_DATABASE_URL:-$(value database url)}"
+case "$DB_URL" in *':***@'*) echo "database.url carries a password; set GANTRY_BACKUP_DATABASE_URL for backups (see the manual)" >&2; exit 1 ;; esac
+
+echo "database -> $DEST/database.dump"
+runuser -u gantry -- pg_dump --format=custom --no-owner --dbname="$DB_URL" > "$DEST/database.dump"
+
+if [ "${BLOB_BACKEND:-fs}" = fs ] && [ -d "${BLOB_PATH:-/var/lib/gantry/blobs}" ]; then
+  echo "attachments -> $DEST/blobs.tar.gz"
+  tar -C "${BLOB_PATH:-/var/lib/gantry/blobs}" -czf "$DEST/blobs.tar.gz" .
+else
+  echo "attachments are in object storage (${BLOB_BACKEND}); back that up with its own tools"
+fi
+
+echo "configuration -> $DEST/etc-gantry.tar.gz"
+tar -C /etc -czf "$DEST/etc-gantry.tar.gz" gantry
+
+rpm -q gantry gantry-web gantry-manual > "$DEST/versions.txt" 2>/dev/null || true
+(cd "$DEST" && sha256sum -- * > SHA256SUMS)
+echo "done: $DEST ($(du -sh "$DEST" | cut -f1))"
+
+if [ "$KEEP" -gt 0 ]; then
+  ls -1d "$ROOT"/20* 2>/dev/null | sort | head -n -"$KEEP" | while read -r old; do
+    echo "removing old backup $old"
+    rm -rf -- "$old"
+  done
+fi

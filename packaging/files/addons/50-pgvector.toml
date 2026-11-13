@@ -1,0 +1,4 @@
+# Installed by gantry-addon-pgvector. Semantic search uses an approximate (HNSW) index
+# in PostgreSQL instead of comparing every stored vector. Remove the package to go back.
+[storage.vector]
+backend = "pgvector"

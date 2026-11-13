@@ -1,0 +1,7 @@
+# /etc/gantry/conf.d/90-worker.toml on worker nodes: same gantry.toml as the application
+# nodes, plus this. Enable the worker and leave the server off:
+#   systemctl enable --now gantry-worker
+#   systemctl disable --now gantry
+
+[worker]
+concurrency = 8

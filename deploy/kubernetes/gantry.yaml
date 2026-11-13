@@ -1,0 +1,125 @@
+# Example: Gantry on Kubernetes. Stateless application and worker Deployments in front of a
+# PostgreSQL database and an S3-compatible object store that you provide.
+#
+#   kubectl create namespace gantry
+#   kubectl -n gantry create secret generic gantry-secrets \
+#     --from-literal=database-url='postgres://gantry:PASSWORD@postgres.db.svc:5432/gantry?sslmode=verify-full' \
+#     --from-literal=secret-key="$(gantry config generate-key)"
+#   kubectl -n gantry apply -f gantry.yaml
+#
+# Create the first administrator once the pods are ready:
+#   kubectl -n gantry exec deploy/gantry -- gantry admin create --email you@example.org --name "You" --generate
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gantry-config
+  namespace: gantry
+data:
+  gantry.toml: |
+    [server]
+    trusted_proxies = ["10.0.0.0/8"]   # your ingress controller's pod network
+    [storage.blob]
+    backend = "s3"
+    endpoint = "https://objects.example.org"
+    bucket = "gantry"
+    region = "us-east-1"
+    access_key = "CHANGE-ME"
+    secret_key = "CHANGE-ME"           # or mount from a Secret into /etc/gantry/conf.d/
+    [worker]
+    embedded = false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gantry
+  namespace: gantry
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: gantry, component: server } }
+  strategy: { type: Recreate }          # all replicas run the same version; see the manual, "Upgrading"
+  template:
+    metadata: { labels: { app: gantry, component: server } }
+    spec:
+      securityContext: { runAsNonRoot: true, seccompProfile: { type: RuntimeDefault } }
+      initContainers:
+        - name: migrate
+          image: registry.example.org/gantry:0.1.0
+          args: ["migrate"]
+          envFrom: &env [{ configMapRef: { name: gantry-env } }]
+          env: &secrets
+            - { name: GANTRY_DATABASE_URL, valueFrom: { secretKeyRef: { name: gantry-secrets, key: database-url } } }
+            - { name: GANTRY_SECRET_KEY,   valueFrom: { secretKeyRef: { name: gantry-secrets, key: secret-key } } }
+          volumeMounts: &mounts [{ name: config, mountPath: /etc/gantry, readOnly: true }]
+      containers:
+        - name: gantry
+          image: registry.example.org/gantry:0.1.0
+          args: ["serve"]
+          ports: [{ name: http, containerPort: 8600 }]
+          envFrom: *env
+          env: *secrets
+          volumeMounts: *mounts
+          readinessProbe: { httpGet: { path: /readyz, port: http }, periodSeconds: 5 }
+          livenessProbe:  { httpGet: { path: /healthz, port: http }, periodSeconds: 10, failureThreshold: 6 }
+          resources: { requests: { cpu: 250m, memory: 128Mi }, limits: { memory: 512Mi } }
+          securityContext: { allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: { drop: ["ALL"] } }
+      volumes: [{ name: config, configMap: { name: gantry-config } }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gantry-worker
+  namespace: gantry
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: gantry, component: worker } }
+  template:
+    metadata: { labels: { app: gantry, component: worker } }
+    spec:
+      securityContext: { runAsNonRoot: true, seccompProfile: { type: RuntimeDefault } }
+      containers:
+        - name: worker
+          image: registry.example.org/gantry:0.1.0
+          args: ["worker"]
+          envFrom: [{ configMapRef: { name: gantry-env } }]
+          env:
+            - { name: GANTRY_DATABASE_URL, valueFrom: { secretKeyRef: { name: gantry-secrets, key: database-url } } }
+            - { name: GANTRY_SECRET_KEY,   valueFrom: { secretKeyRef: { name: gantry-secrets, key: secret-key } } }
+          volumeMounts: [{ name: config, mountPath: /etc/gantry, readOnly: true }]
+          resources: { requests: { cpu: 100m, memory: 96Mi }, limits: { memory: 512Mi } }
+          securityContext: { allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: { drop: ["ALL"] } }
+      volumes: [{ name: config, configMap: { name: gantry-config } }]
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gantry-env
+  namespace: gantry
+data:
+  GANTRY_PUBLIC_URL: "https://gantry.example.org"
+  GANTRY_BIND: "0.0.0.0:8600"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gantry
+  namespace: gantry
+spec:
+  selector: { app: gantry, component: server }
+  ports: [{ name: http, port: 80, targetPort: http }]
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gantry
+  namespace: gantry
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "26m"
+    # Live updates use a WebSocket at /api/v1/ws; keep idle connections open for an hour.
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+spec:
+  tls: [{ hosts: ["gantry.example.org"], secretName: gantry-tls }]
+  rules:
+    - host: gantry.example.org
+      http:
+        paths: [{ path: /, pathType: Prefix, backend: { service: { name: gantry, port: { name: http } } } }]

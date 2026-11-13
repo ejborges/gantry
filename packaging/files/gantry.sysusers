@@ -1,0 +1,2 @@
+#Type Name   ID GECOS                 Home             Shell
+u     gantry -  "Gantry service"      /var/lib/gantry  /sbin/nologin

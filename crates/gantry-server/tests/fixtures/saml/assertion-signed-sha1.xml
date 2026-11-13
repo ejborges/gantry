@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="_resp1" Version="2.0" IssueInstant="2026-06-01T12:00:00Z" Destination="https://gantry.example.org/api/v1/auth/saml/11111111-1111-1111-1111-111111111111/acs" InResponseTo="_req1">
+  <saml:Issuer>https://idp.example.org/entity</saml:Issuer>
+  
+  <samlp:Status>
+    <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+  </samlp:Status>
+  <saml:Assertion xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="_assert1" Version="2.0" IssueInstant="2026-06-01T12:00:00Z">
+    <saml:Issuer>https://idp.example.org/entity</saml:Issuer>
+    <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+      <ds:SignedInfo>
+        <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+        <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+        <ds:Reference URI="#_assert1">
+          <ds:Transforms>
+            <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+            <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"><ec:InclusiveNamespaces xmlns:ec="http://www.w3.org/2001/10/xml-exc-c14n#" PrefixList="xs"/></ds:Transform>
+          </ds:Transforms>
+          <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+          <ds:DigestValue>Z1A4iDBvo1P5T0YkpHEiOaaztgI=</ds:DigestValue>
+        </ds:Reference>
+      </ds:SignedInfo>
+      <ds:SignatureValue>qKrBNXfPJpOEQEMyCMpGGmRNPyB/iXiRI148al4nQ8dc2TcFRl5Xi3Xd5YHj4dhw
+E6byTspBu6aIvRMl4YddmhB8hRLOcJu78Hc6pPI3gOqcmGwEDPXz/GnapljdZges
+m7JnMzV+8XrxwpT3Ci5AIquopsgDeGfOtScENss75AhWcFlxxFpHpq5Xa7RJwLf3
+h5ytr5Aw+fGR92+yXWUZE+H1vD3ugRB41Wh09+/w2lTE5MNtMcdQASIBuFaKjHyx
+OjdCmPsm5f6mKswkxr/+rNddDSw7zZxHHQ0lWWD5sRgxNANBJbN/67g5jm5gE/P8
+Cy/7obOhXtlVmAydylJcGg==</ds:SignatureValue>
+    </ds:Signature>
+    <saml:Subject>
+      <saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">ada@example.org</saml:NameID>
+      <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+        <saml:SubjectConfirmationData InResponseTo="_req1" NotOnOrAfter="2026-06-01T12:05:00Z" Recipient="https://gantry.example.org/api/v1/auth/saml/11111111-1111-1111-1111-111111111111/acs"/>
+      </saml:SubjectConfirmation>
+    </saml:Subject>
+    <saml:Conditions NotBefore="2026-06-01T11:59:00Z" NotOnOrAfter="2026-06-01T12:10:00Z">
+      <saml:AudienceRestriction><saml:Audience>https://gantry.example.org/api/v1/auth/saml/11111111-1111-1111-1111-111111111111/metadata</saml:Audience></saml:AudienceRestriction>
+    </saml:Conditions>
+    <saml:AuthnStatement AuthnInstant="2026-06-01T12:00:00Z" SessionIndex="_s1">
+      <saml:AuthnContext><saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></saml:AuthnContext>
+    </saml:AuthnStatement>
+    <saml:AttributeStatement>
+      <saml:Attribute Name="displayName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+        <saml:AttributeValue xsi:type="xs:string">Ada Lovelace &amp; Co. &lt;R&amp;D&gt;</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="mail" FriendlyName="email">
+        <saml:AttributeValue xsi:type="xs:string">ada@example.org</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="groups">
+        <saml:AttributeValue xsi:type="xs:string">engineering</saml:AttributeValue>
+        <saml:AttributeValue xsi:type="xs:string">ops</saml:AttributeValue>
+      </saml:Attribute>
+    </saml:AttributeStatement>
+  </saml:Assertion>
+</samlp:Response>

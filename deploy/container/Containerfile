@@ -1,0 +1,26 @@
+# Gantry application image built from the RPMs.
+#
+#   packaging/build-rpms.sh                       (on an Enterprise Linux 9 build host)
+#   podman build -f deploy/container/Containerfile -t gantry:0.1.0 dist/gantry-0.1.0
+#
+# The image contains the server, web application and manual. PostgreSQL, nginx and the
+# setup scripts are not used in a container: bring your own database and ingress, and
+# configure through the environment (see docs: Reference, Configuration).
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
+
+COPY core/gantry-[0-9]*.rpm core/gantry-web-*.rpm core/gantry-manual-*.rpm /tmp/rpms/
+# The dependencies on PostgreSQL and nginx belong to the single-server installation.
+RUN microdnf install -y shadow-utils ca-certificates && \
+    rpm -ivh --nodeps --noscripts /tmp/rpms/*.rpm && \
+    useradd --system --home-dir /var/lib/gantry --shell /sbin/nologin gantry && \
+    install -d -o gantry -g gantry -m 0750 /var/lib/gantry /var/lib/gantry/blobs && \
+    rm -rf /tmp/rpms && microdnf clean all
+
+ENV GANTRY_BIND=0.0.0.0:8600 \
+    GANTRY_LOG_FORMAT=json
+USER gantry
+EXPOSE 8600
+# Required at run time: GANTRY_DATABASE_URL, GANTRY_SECRET_KEY, GANTRY_PUBLIC_URL.
+# Mount a gantry.toml at /etc/gantry/gantry.toml for anything else (object storage, proxies).
+ENTRYPOINT ["/usr/bin/gantry"]
+CMD ["serve"]
